@@ -279,70 +279,8 @@
   margin: 0;
 }
 
-.valueProposition {
-  padding: 4rem 0;
-  background-color: white;
-}
-
-.valueDescription {
-  font-size: 1.2rem;
-  max-width: 800px;
-  margin: 0 auto 2rem;
-  color: #444;
-}
-
-.valueCard {
-  text-align: center;
-  padding: 2rem 1rem;
-}
-
-.valueCard h3 {
-  color: #2a4d69;
-  margin-bottom: 1rem;
-}
-
-.valueCard p {
-  color: #666;
-  line-height: 1.6;
-}
-
-.modulePreview {
-  padding: 4rem 0;
-  background-color: #f8f9fa;
-}
-
-.moduleCard {
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  height: 100%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.moduleCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-.moduleCard h3 {
-  color: #2a4d69;
-  margin-bottom: 1rem;
-}
-
-.moduleLink {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #2a4d69;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
 .moduleLink:hover {
   background-color: #1a2a6c;
   color: white;
 }
+
