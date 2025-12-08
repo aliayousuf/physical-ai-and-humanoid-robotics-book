@@ -1,0 +1,516 @@
+openapi: 3.0.0
+info:
+  title: Physical AI & Humanoid Robotics Book API
+  description: API for the Physical AI & Humanoid Robotics Book documentation site
+  version: 1.0.0
+  contact:
+    name: Book Development Team
+    email: contact@physical-ai-book.org
+
+servers:
+  - url: https://api.physical-ai-book.org/v1
+    description: Production server
+  - url: https://staging-api.physical-ai-book.org/v1
+    description: Staging server
+
+paths:
+  /modules:
+    get:
+      summary: Get all book modules
+      description: Retrieve a list of all modules in the Physical AI & Humanoid Robotics book
+      responses:
+        '200':
+          description: Successful response with list of modules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  modules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookModule'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /modules/{moduleId}:
+    get:
+      summary: Get a specific module
+      description: Retrieve details about a specific module by its ID
+      parameters:
+        - name: moduleId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "module-1-ros2"
+          description: Unique identifier of the module
+      responses:
+        '200':
+          description: Successful response with module details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookModule'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /modules/{moduleId}/chapters:
+    get:
+      summary: Get chapters in a module
+      description: Retrieve all chapters within a specific module
+      parameters:
+        - name: moduleId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "module-1-ros2"
+          description: Unique identifier of the module
+      responses:
+        '200':
+          description: Successful response with list of chapters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chapters:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Chapter'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /chapters/{chapterId}:
+    get:
+      summary: Get a specific chapter
+      description: Retrieve details about a specific chapter by its ID
+      parameters:
+        - name: chapterId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "module-1-chapter-1"
+          description: Unique identifier of the chapter
+      responses:
+        '200':
+          description: Successful response with chapter details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chapter'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /search:
+    get:
+      summary: Search book content
+      description: Search across all book content
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "ROS 2 nodes"
+          description: Search query
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Maximum number of results to return
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of results to skip
+      responses:
+        '200':
+          description: Successful response with search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SearchResult'
+                  total:
+                    type: integer
+                    description: Total number of results
+                  limit:
+                    type: integer
+                    description: Number of results returned
+                  offset:
+                    type: integer
+                    description: Number of results skipped
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /progress:
+    get:
+      summary: Get user progress
+      description: Retrieve the user's progress through the book
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Unique identifier of the user
+      responses:
+        '200':
+          description: Successful response with user progress
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  progress:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserProgress'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Update user progress
+      description: Update the user's progress for a specific chapter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProgress'
+      responses:
+        '200':
+          description: Successful response with updated progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProgress'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    BookModule:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - order
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the module
+          example: "module-1-ros2"
+        title:
+          type: string
+          description: Display title of the module
+          example: "The Robotic Nervous System (ROS 2)"
+        description:
+          type: string
+          description: Overview of module content
+          example: "Introduction to ROS 2 fundamentals and robot communication"
+        order:
+          type: integer
+          description: Sequential position in the learning progression
+          example: 1
+          minimum: 1
+          maximum: 4
+        chapters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Chapter'
+          description: List of chapters in this module
+        learningOutcomes:
+          type: array
+          items:
+            type: string
+          description: List of specific skills/knowledge learners will gain
+          example: ["Understand ROS 2 communication patterns", "Create ROS 2 packages"]
+        prerequisites:
+          type: array
+          items:
+            type: string
+          description: List of required knowledge or completed modules
+          example: []
+        estimatedTime:
+          type: integer
+          description: Estimated hours to complete the module
+          example: 10
+
+    Chapter:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - contentType
+        - module
+        - order
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the chapter
+          example: "module-1-chapter-1"
+        title:
+          type: string
+          description: Display title of the chapter
+          example: "ROS 2 Middleware Fundamentals"
+        description:
+          type: string
+          description: Brief overview of chapter content
+          example: "Introduction to ROS 2 middleware and communication patterns"
+        contentType:
+          type: string
+          enum: [conceptual, technical, applied]
+          description: Type of content in the chapter
+          example: "conceptual"
+        module:
+          type: string
+          description: Reference to parent Book Module ID
+          example: "module-1-ros2"
+        order:
+          type: integer
+          description: Sequential position within the parent module
+          example: 1
+        practicalExamples:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticalExample'
+          description: List of practical examples in this chapter
+        learningObjectives:
+          type: array
+          items:
+            type: string
+          description: List of specific learning objectives
+          example: ["Explain ROS 2 communication patterns", "Create a basic ROS 2 node"]
+        duration:
+          type: integer
+          description: Estimated minutes to complete the chapter
+          example: 45
+        prerequisites:
+          type: array
+          items:
+            type: string
+          description: List of required knowledge or completed chapters
+          example: []
+
+    PracticalExample:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - chapter
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the example
+          example: "example-1-1-1"
+        title:
+          type: string
+          description: Display title of the example
+          example: "Basic Publisher Node"
+        description:
+          type: string
+          description: What the example demonstrates
+          example: "Creating a simple publisher node that sends messages"
+        chapter:
+          type: string
+          description: Reference to parent Chapter ID
+          example: "module-1-chapter-1"
+        codeFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeFile'
+          description: List of code files for this example
+        dependencies:
+          type: array
+          items:
+            type: string
+          description: List of required tools/technologies
+          example: ["ROS 2 Humble", "Python 3.8+"]
+        expectedOutcome:
+          type: string
+          description: What user should achieve
+          example: "A running publisher node that sends messages to a topic"
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          description: Difficulty level of the example
+          example: "beginner"
+        estimatedTime:
+          type: integer
+          description: Estimated minutes to complete the example
+          example: 20
+        downloadable:
+          type: boolean
+          description: Whether example files are available for download
+          example: true
+
+    CodeFile:
+      type: object
+      required:
+        - path
+        - language
+      properties:
+        path:
+          type: string
+          description: Relative path to the code file
+          example: "examples/basic_publisher.py"
+        language:
+          type: string
+          description: Programming language
+          example: "python"
+        description:
+          type: string
+          description: Brief description of the file's purpose
+          example: "Basic ROS 2 publisher node implementation"
+
+    SearchResult:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - url
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the search result
+          example: "module-1-chapter-1"
+        title:
+          type: string
+          description: Title of the matching content
+          example: "ROS 2 Middleware Fundamentals"
+        description:
+          type: string
+          description: Brief description of the matching content
+          example: "Introduction to ROS 2 middleware and communication patterns"
+        url:
+          type: string
+          description: Relative URL to the content page
+          example: "/docs/module-1-ros2/concepts/ros2-middleware"
+        module:
+          type: string
+          description: Module ID where content is located
+          example: "module-1-ros2"
+        chapter:
+          type: string
+          description: Chapter ID where content is located
+          example: "module-1-chapter-1"
+        relevanceScore:
+          type: number
+          format: float
+          description: Relevance score for the search result
+          example: 0.95
+
+    UserProgress:
+      type: object
+      required:
+        - userId
+        - chapterId
+        - status
+      properties:
+        userId:
+          type: string
+          description: Unique identifier for the user
+          example: "user-12345"
+        chapterId:
+          type: string
+          description: Reference to the Chapter being tracked
+          example: "module-1-chapter-1"
+        status:
+          type: string
+          enum: [not-started, in-progress, completed]
+          description: Current status of the chapter for this user
+          example: "completed"
+        timeSpent:
+          type: integer
+          description: Time spent in seconds
+          example: 1800
+        lastAccessed:
+          type: string
+          format: date-time
+          description: Timestamp of last interaction
+          example: "2023-10-15T10:30:00Z"
+        completionDate:
+          type: string
+          format: date-time
+          description: Timestamp when status became "completed"
+          example: "2023-10-15T10:45:00Z"
+        notes:
+          type: string
+          description: Optional user notes about the chapter
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Optional rating from 1-5
+          example: 5
+
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Not Found"
+              message:
+                type: string
+                example: "The requested resource could not be found"
+    BadRequest:
+      description: The request was invalid
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Bad Request"
+              message:
+                type: string
+                example: "The request contains invalid parameters"
+    InternalServerError:
+      description: An internal server error occurred
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Internal Server Error"
+              message:
+                type: string
+                example: "An unexpected error occurred on the server"

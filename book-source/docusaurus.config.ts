@@ -5,8 +5,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'Physical AI & Humanoid Robotics',
+  tagline: 'A comprehensive guide to bridging digital AI with physical robotics',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -75,9 +75,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'My Site',
+      title: 'Physical AI & Humanoid Robotics',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Physical AI & Humanoid Robotics Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -85,7 +85,7 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Book',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
@@ -95,15 +95,117 @@ const config: Config = {
         },
       ],
     },
+    algolia: {
+      // The application ID provided by Algolia
+      appId: 'YOUR_ALGOLIA_APP_ID',
+
+      // Public API key: it is safe to commit it
+      apiKey: 'YOUR_ALGOLIA_API_KEY',
+
+      indexName: 'physical-ai-humanoid-robotics',
+
+      // Optional: see doc section below
+      contextualSearch: true,
+
+      // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+      externalUrlRegex: 'external\\.com|domain\\.com',
+
+      // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+      replaceSearchResultPathname: {
+        from: '/docs/', // or as RegExp: /\/docs\//
+        to: '/docs/',
+      },
+
+      // Optional: path for search page that enabled by default (`false` to disable it)
+      searchPagePath: 'search',
+
+      // Additional error handling configuration
+      placeholder: 'Search Physical AI & Robotics...',
+      translations: {
+        button: {
+          buttonText: 'Search',
+          buttonAriaLabel: 'Search for content',
+        },
+        modal: {
+          searchBox: {
+            resetButtonTitle: 'Clear the query',
+            resetButtonAriaLabel: 'Clear the search query',
+            cancelButtonText: 'Cancel',
+            cancelButtonAriaLabel: 'Cancel search',
+          },
+          startScreen: {
+            recentSearchesTitle: 'Recent searches',
+            noRecentSearchesText: 'No recent searches',
+            saveRecentSearchButtonTitle: 'Save this search',
+            removeRecentSearchButtonTitle: 'Remove this search from history',
+            favoriteSearchesTitle: 'Favorite searches',
+            removeFavoriteSearchButtonTitle: 'Remove this search from favorites',
+          },
+          errorScreen: {
+            titleText: 'Unable to fetch results',
+            helpText: 'You might want to check your network connection.',
+          },
+          footer: {
+            selectText: 'to select',
+            selectKeyAriaLabel: 'Enter key',
+            navigateText: 'to navigate',
+            navigateUpKeyAriaLabel: 'Arrow up',
+            navigateDownKeyAriaLabel: 'Arrow down',
+            closeText: 'to close',
+            closeKeyAriaLabel: 'Escape key',
+            searchByText: 'Search by',
+          },
+          noResultsScreen: {
+            noResultsText: 'No results for',
+            suggestedQueryText: 'Try searching for',
+            reportMissingResultsText: 'Believe this query should return results?',
+            reportMissingResultsLinkText: 'Let us know.',
+          },
+        },
+      },
+    },
     footer: {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Documentation',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Introduction',
               to: '/docs/intro',
+            },
+            {
+              label: 'Module 1: ROS 2',
+              to: '/docs/module-1-ros2',
+            },
+            {
+              label: 'Module 2: Digital Twin',
+              to: '/docs/module-2-digital-twin',
+            },
+            {
+              label: 'Module 3: NVIDIA Isaac',
+              to: '/docs/module-3-nvidia-isaac',
+            },
+            {
+              label: 'Module 4: VLA Models',
+              to: '/docs/module-4-vla',
+            },
+          ],
+        },
+        {
+          title: 'Resources',
+          items: [
+            {
+              label: 'Glossary',
+              to: '/docs/glossary',
+            },
+            {
+              label: 'References',
+              to: '/docs/references',
+            },
+            {
+              label: 'Prerequisites',
+              to: '/docs/prerequisites',
             },
           ],
         },
@@ -111,34 +213,21 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'X',
-              href: 'https://x.com/docusaurus',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/your-organization/physical-ai-humanoid-robotics',
+            },
+            {
+              label: 'ROS Community',
+              href: 'https://discourse.ros.org/',
+            },
+            {
+              label: 'Robotics Stack Exchange',
+              href: 'https://robotics.stackexchange.com/',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Physical AI & Humanoid Robotics Book. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
