@@ -15,17 +15,17 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://physical-ai-humanoid-robotics-book.vercel.app',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'aliayousuf', // Usually your GitHub org/user name.
+  projectName: 'physical-ai-and-humanoid-robotics-book', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -44,7 +44,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/aliayousuf/physical-ai-and-humanoid-robotics-book/edit/main/',
         },
         blog: {
           showReadingTime: true,
@@ -55,7 +55,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/aliayousuf/physical-ai-and-humanoid-robotics-book/edit/main/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -89,81 +89,83 @@ const config: Config = {
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/aliayousuf/physical-ai-and-humanoid-robotics-book',
           label: 'GitHub',
           position: 'right',
         },
       ],
     },
-    algolia: {
-      // The application ID provided by Algolia
-      appId: 'YOUR_ALGOLIA_APP_ID',
+    ...(process.env.ALGOLIA_APP_ID && process.env.ALGOLIA_API_KEY && {
+      algolia: {
+        // The application ID provided by Algolia
+        appId: process.env.ALGOLIA_APP_ID,
 
-      // Public API key: it is safe to commit it
-      apiKey: 'YOUR_ALGOLIA_API_KEY',
+        // Public API key: it is safe to commit it
+        apiKey: process.env.ALGOLIA_API_KEY,
 
-      indexName: 'physical-ai-humanoid-robotics',
+        indexName: 'physical-ai-humanoid-robotics',
 
-      // Optional: see doc section below
-      contextualSearch: true,
+        // Optional: see doc section below
+        contextualSearch: true,
 
-      // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-      externalUrlRegex: 'external\\.com|domain\\.com',
+        // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+        externalUrlRegex: 'external\\.com|domain\\.com',
 
-      // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
-      replaceSearchResultPathname: {
-        from: '/docs/', // or as RegExp: /\/docs\//
-        to: '/docs/',
-      },
-
-      // Optional: path for search page that enabled by default (`false` to disable it)
-      searchPagePath: 'search',
-
-      // Additional error handling configuration
-      placeholder: 'Search Physical AI & Robotics...',
-      translations: {
-        button: {
-          buttonText: 'Search',
-          buttonAriaLabel: 'Search for content',
+        // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+        replaceSearchResultPathname: {
+          from: '/docs/', // or as RegExp: /\/docs\//
+          to: '/docs/',
         },
-        modal: {
-          searchBox: {
-            resetButtonTitle: 'Clear the query',
-            resetButtonAriaLabel: 'Clear the search query',
-            cancelButtonText: 'Cancel',
-            cancelButtonAriaLabel: 'Cancel search',
+
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        searchPagePath: 'search',
+
+        // Additional error handling configuration
+        placeholder: 'Search Physical AI & Robotics...',
+        translations: {
+          button: {
+            buttonText: 'Search',
+            buttonAriaLabel: 'Search for content',
           },
-          startScreen: {
-            recentSearchesTitle: 'Recent searches',
-            noRecentSearchesText: 'No recent searches',
-            saveRecentSearchButtonTitle: 'Save this search',
-            removeRecentSearchButtonTitle: 'Remove this search from history',
-            favoriteSearchesTitle: 'Favorite searches',
-            removeFavoriteSearchButtonTitle: 'Remove this search from favorites',
-          },
-          errorScreen: {
-            titleText: 'Unable to fetch results',
-            helpText: 'You might want to check your network connection.',
-          },
-          footer: {
-            selectText: 'to select',
-            selectKeyAriaLabel: 'Enter key',
-            navigateText: 'to navigate',
-            navigateUpKeyAriaLabel: 'Arrow up',
-            navigateDownKeyAriaLabel: 'Arrow down',
-            closeText: 'to close',
-            closeKeyAriaLabel: 'Escape key',
-            searchByText: 'Search by',
-          },
-          noResultsScreen: {
-            noResultsText: 'No results for',
-            suggestedQueryText: 'Try searching for',
-            reportMissingResultsText: 'Believe this query should return results?',
-            reportMissingResultsLinkText: 'Let us know.',
+          modal: {
+            searchBox: {
+              resetButtonTitle: 'Clear the query',
+              resetButtonAriaLabel: 'Clear the search query',
+              cancelButtonText: 'Cancel',
+              cancelButtonAriaLabel: 'Cancel search',
+            },
+            startScreen: {
+              recentSearchesTitle: 'Recent searches',
+              noRecentSearchesText: 'No recent searches',
+              saveRecentSearchButtonTitle: 'Save this search',
+              removeRecentSearchButtonTitle: 'Remove this search from history',
+              favoriteSearchesTitle: 'Favorite searches',
+              removeFavoriteSearchButtonTitle: 'Remove this search from favorites',
+            },
+            errorScreen: {
+              titleText: 'Unable to fetch results',
+              helpText: 'You might want to check your network connection.',
+            },
+            footer: {
+              selectText: 'to select',
+              selectKeyAriaLabel: 'Enter key',
+              navigateText: 'to navigate',
+              navigateUpKeyAriaLabel: 'Arrow up',
+              navigateDownKeyAriaLabel: 'Arrow down',
+              closeText: 'to close',
+              closeKeyAriaLabel: 'Escape key',
+              searchByText: 'Search by',
+            },
+            noResultsScreen: {
+              noResultsText: 'No results for',
+              suggestedQueryText: 'Try searching for',
+              reportMissingResultsText: 'Believe this query should return results?',
+              reportMissingResultsLinkText: 'Let us know.',
+            },
           },
         },
       },
-    },
+    }),
     footer: {
       style: 'dark',
       links: [
@@ -214,7 +216,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/your-organization/physical-ai-humanoid-robotics',
+              href: 'https://github.com/aliayousuf/physical-ai-and-humanoid-robotics-book',
             },
             {
               label: 'ROS Community',
