@@ -1,55 +1,45 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: undefined → 1.0.0
+- Added sections: All principles and sections based on Physical AI & Humanoid Robotics educational framework
+- Templates requiring updates:
+  - .specify/templates/plan-template.md ✅ no changes needed (generic template)
+  - .specify/templates/spec-template.md ✅ no changes needed (generic template)
+  - .specify/templates/tasks-template.md ✅ no changes needed (generic template)
+- Follow-up TODOs: None
+-->
+# Physical AI & Humanoid Robotics Book Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Decision Point Mapping
+Every chapter and learning activity must identify critical decisions learners must make, distinguishing between decisions requiring human reasoning versus those suitable for agent execution. Content must provide decision frameworks with criteria, constraints, examples, and context-specific prompts.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Reasoning Activation
+Content must force learners to think and reason rather than mimic or passively consume. Instruction adapts across comprehension, application, analysis, and meta-cognition layers. Learners must continuously build meta-awareness of what they're doing, why, and how to improve their reasoning.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Intelligence Accumulation
+Every chapter must accumulate reusable intelligence by reusing context from earlier chapters and producing outputs that become future inputs (skills, patterns, tools, sub-agents). Chapters function as progressive intelligence scaffolds, not isolated knowledge units.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Right Altitude
+Avoid extremes: too low (rigid, prescriptive instructions) or too high (vague directives). Content must maintain 'just right' decision frameworks with concrete reasoning prompts, examples, constraints, and adaptive pathways.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Frameworks Over Rules
+Avoid hard rules; prefer conditional reasoning that adapts to the learner's clarity, goals, and state of reasoning. Use conditional structures like 'If the learner lacks clarity on what is being built (spec), delay showing implementation (code).'
 
-### [PRINCIPLE_6_NAME]
+### Meta-Awareness Against Convergence
+Actively disrupt convergence toward predictable teaching patterns such as lecture formats, taxonomy-driven sequencing, toy examples, and passive explanation. Maintain adaptive variability through Socratic dialogue, discovery tasks, spec-first building, error analysis, collaborative debugging, and multi-agent reasoning activities.
 
+## Technical Requirements
 
-[PRINCIPLE__DESCRIPTION]
+The published textbook must include an embedded RAG chatbot, built with OpenAI Agents / ChatKit SDKs, FastAPI backend, Neon Serverless Postgres (for structured knowledge), and Qdrant Cloud Free Tier (for vector retrieval). Capabilities required: answer questions about the book's content, operate as a reader-assistant that responds based only on selected text when required, and serve as a living, spec-driven companion demonstrating agentic software principles.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Development Workflow
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+All content follows Spec-Driven Development (SDD) methodology. Every chapter must include decision frameworks, reasoning activation, and intelligence accumulation. Content must be built using Spec-Kit Plus tools and follow agentic development paradigms.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other practices for the Physical AI & Humanoid Robotics book project. All content must comply with the core principles of Decision Point Mapping, Reasoning Activation, Intelligence Accumulation, Right Altitude, Frameworks Over Rules, and Meta-Awareness Against Convergence. Amendments require documentation of impact on learning outcomes and pedagogical effectiveness.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-12-08 | **Last Amended**: 2025-12-08
