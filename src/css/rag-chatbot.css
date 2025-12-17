@@ -1,0 +1,358 @@
+/* RAG Chatbot Styles */
+
+.rag-chatbot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  min-height: 400px;
+  max-height: 500px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+/* Open state */
+.rag-chatbot-container.open {
+  height: 500px;
+}
+
+/* Floating button when minimized */
+.rag-chatbot-container.minimized {
+  width: 60px;
+  height: 60px;
+  min-height: 60px;
+  border-radius: 50%;
+  bottom: 20px;
+  right: 20px;
+  overflow: visible;
+}
+
+/* Hide content when minimized */
+.rag-chatbot-container.minimized .rag-chatbot-header,
+.rag-chatbot-container.minimized .rag-chatbot-messages,
+.rag-chatbot-container.minimized .chat-input-container {
+  display: none;
+}
+
+/* Hide minimize button when minimized */
+.rag-chatbot-container.minimized .minimize-btn {
+  display: none;
+}
+
+/* Show floating button when minimized */
+.rag-chatbot-container.minimized .expand-btn {
+  display: block;
+  width: 60px;
+  height: 60px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.rag-chatbot-container.minimized .expand-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  background-color: #4338ca;
+}
+
+/* Make sure the button has a rounded blue widget appearance */
+.rag-chatbot-container.minimized .expand-btn {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+}
+
+/* Hide expand button when open */
+.rag-chatbot-container .expand-btn {
+  display: none;
+}
+
+/* Header styles */
+.rag-chatbot-header {
+  background-color: #4f46e5;
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rag-chatbot-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chatbot-mode-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.mode-general {
+  color: #a7f3d0;
+}
+
+.mode-selected_text {
+  color: #fde68a;
+}
+
+.clear-context-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.clear-context-btn:hover {
+  background-color: #dc2626;
+}
+
+.minimize-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.minimize-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Messages container */
+.rag-chatbot-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #f9fafb;
+}
+
+.welcome-message {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Chat input container */
+.chat-input-container {
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  background-color: white;
+}
+
+/* Message styles */
+.message-container {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: #4f46e5;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.assistant-message {
+  align-self: flex-start;
+  background-color: #e5e7eb;
+  color: #1f2937;
+  border-bottom-left-radius: 4px;
+}
+
+.message-sources {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #d1d5db;
+  font-size: 0.85rem;
+}
+
+.message-sources summary {
+  cursor: pointer;
+  color: #4f46e5;
+  font-weight: 500;
+}
+
+.message-sources ul {
+  list-style: none;
+  padding: 8px 0 0 0;
+  margin: 0;
+}
+
+.source-item {
+  margin: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.source-item a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.source-item a:hover {
+  text-decoration: underline;
+}
+
+.relevance-score {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Input form styles */
+.chat-input-form {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 24px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.chat-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.chat-submit-btn {
+  padding: 12px 20px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-submit-btn:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.chat-submit-btn:not(:disabled):hover {
+  background-color: #4338ca;
+}
+
+/* Text selection overlay */
+.text-selection-overlay {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background-color: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  padding: 8px 12px;
+  z-index: 10000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
+}
+
+.selected-text-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.selected-text-preview {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clear-selection-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.clear-selection-btn:hover {
+  background-color: #dc2626;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .rag-chatbot-container {
+    width: 300px;
+    min-width: 300px;
+    max-width: calc(100vw - 20px);
+    max-height: 400px;
+  }
+
+  .rag-chatbot-container.minimized {
+    width: 200px;
+  }
+
+  .message-container {
+    max-width: 90%;
+  }
+
+  .rag-chatbot-header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .chatbot-mode-indicator {
+    justify-content: center;
+  }
+
+  .chat-input-form {
+    flex-direction: column;
+  }
+
+  .chat-submit-btn {
+    align-self: flex-end;
+  }
+}

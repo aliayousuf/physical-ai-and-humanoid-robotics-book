@@ -68,6 +68,31 @@ const config: Config = {
     ],
   ],
 
+<<<<<<< HEAD
+=======
+  plugins: [
+    // Add proxy configuration for development
+    async function proxyPlugin() {
+      return {
+        name: 'webpack-proxy-plugin',
+        configureWebpack() {
+          return {
+            devServer: {
+              proxy: [
+                {
+                  context: ['/api'],
+                  target: 'http://localhost:8000',
+                  changeOrigin: true,
+                  secure: false,
+                },
+              ],
+            },
+          };
+        },
+      };
+    },
+  ],
+>>>>>>> 6544204 (added backend folder)
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',

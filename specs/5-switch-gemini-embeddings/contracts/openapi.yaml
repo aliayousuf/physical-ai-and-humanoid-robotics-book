@@ -1,0 +1,586 @@
+openapi: 3.0.1
+info:
+  title: RAG Chatbot API with Google Gemini Embeddings
+  description: API for the RAG (Retrieval-Augmented Generation) chatbot that uses Google's Gemini embedding model instead of Cohere
+  version: 1.0.0
+  contact:
+    name: Development Team
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /api/v1/chat/session:
+    post:
+      summary: Create a new chat session
+      description: Creates a new user session for maintaining conversation context
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                initial_context:
+                  type: string
+                  description: Initial context for the session
+                  example: "Physical AI and Humanoid Robotics documentation"
+              required:
+                - initial_context
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSessionResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/chat/session/{sessionId}:
+    get:
+      summary: Get session details
+      description: Retrieve details about a specific user session
+      operationId: getSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the session
+      responses:
+        '200':
+          description: Session details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSessionResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/chat/query:
+    post:
+      summary: Process user query with RAG
+      description: Process a user query using RAG methodology with Google Gemini embeddings
+      operationId: processQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Query processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/content/search:
+    get:
+      summary: Semantic search of book content
+      description: Perform semantic search on book content using Google Gemini embeddings
+      operationId: searchContent
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query text
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 5
+          description: Maximum number of results to return
+      responses:
+        '200':
+          description: Search results returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/content/index:
+    post:
+      summary: Index book content for RAG
+      description: Index book content chunks for semantic search using Google Gemini embeddings
+      operationId: indexContent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndexContentRequest'
+      responses:
+        '200':
+          description: Content indexed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexContentResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/status:
+    get:
+      summary: Get system status
+      description: Retrieve the current status of various system components
+      operationId: getStatus
+      responses:
+        '200':
+          description: System status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateSessionResponse:
+      type: object
+      required:
+        - session_id
+        - created_at
+        - expires_at
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the session
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        created_at:
+          type: string
+          format: date-time
+          description: When the session was created
+          example: "2025-12-17T10:30:00Z"
+        expires_at:
+          type: string
+          format: date-time
+          description: When the session expires
+          example: "2025-12-18T10:30:00Z"
+
+    GetSessionResponse:
+      type: object
+      required:
+        - session_id
+        - created_at
+        - last_interaction
+        - history
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the session
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        created_at:
+          type: string
+          format: date-time
+          description: When the session was created
+          example: "2025-12-17T10:30:00Z"
+        last_interaction:
+          type: string
+          format: date-time
+          description: When the last interaction occurred
+          example: "2025-12-17T10:35:00Z"
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          description: Conversation history for this session
+
+    QueryRequest:
+      type: object
+      required:
+        - session_id
+        - query
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        query:
+          type: string
+          description: User query text
+          example: "What are the key principles of humanoid robotics?"
+        mode:
+          type: string
+          enum: [general, selected_text]
+          description: Query mode - general for book content or selected_text for specific text context
+          default: general
+        selected_text:
+          type: string
+          description: Text selected by user when in selected_text mode
+          example: "The key principles of humanoid robotics include..."
+        context:
+          type: object
+          description: Additional context for the query
+          properties:
+            page_url:
+              type: string
+              description: URL of the page where query originated
+              example: "/docs/introduction"
+            section_context:
+              type: string
+              description: Context around the selected section
+
+    QueryResponse:
+      type: object
+      required:
+        - response_id
+        - session_id
+        - query
+        - response
+        - sources
+        - timestamp
+        - query_mode
+      properties:
+        response_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this response
+          example: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        query:
+          type: string
+          description: Original user query
+          example: "What are the key principles of humanoid robotics?"
+        response:
+          type: string
+          description: AI-generated response to the query
+          example: "The key principles of humanoid robotics include..."
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceReference'
+          description: References to book sections used in the response
+        timestamp:
+          type: string
+          format: date-time
+          description: When the response was generated
+          example: "2025-12-17T10:32:00Z"
+        query_mode:
+          type: string
+          enum: [general, selected_text]
+          description: Mode of the original query
+          example: "general"
+
+    SourceReference:
+      type: object
+      required:
+        - content_id
+        - title
+        - page_reference
+        - relevance_score
+      properties:
+        content_id:
+          type: string
+          description: Unique identifier for the content
+          example: "content-001"
+        title:
+          type: string
+          description: Title of the content section
+          example: "Introduction to Humanoid Robotics"
+        page_reference:
+          type: string
+          description: Page or URL reference to the content
+          example: "/docs/introduction"
+        relevance_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Relevance score of the source to the query
+          example: 0.92
+
+    SearchResponse:
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentResult'
+          description: Search results
+        totalCount:
+          type: integer
+          description: Total number of results available
+          example: 5
+
+    ContentResult:
+      type: object
+      required:
+        - content_id
+        - title
+        - content_text
+        - relevance_score
+      properties:
+        content_id:
+          type: string
+          description: Unique identifier for the content
+          example: "content-001"
+        title:
+          type: string
+          description: Title of the content section
+          example: "Principles of Humanoid Robotics"
+        content_text:
+          type: string
+          description: Excerpt of the content text
+          example: "The key principles of humanoid robotics include..."
+        page_reference:
+          type: string
+          description: Page or URL reference to the content
+          example: "/docs/introduction"
+        relevance_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Relevance score of the content to the query
+          example: 0.92
+
+    IndexContentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentChunk'
+          description: Array of content chunks to index
+        force_reindex:
+          type: boolean
+          description: Whether to force reindexing of existing content
+          default: false
+
+    ContentChunk:
+      type: object
+      required:
+        - title
+        - content_text
+        - section_ref
+      properties:
+        title:
+          type: string
+          description: Title of the content section
+          example: "Introduction to Physical AI"
+        content_text:
+          type: string
+          description: The actual content text to index
+          example: "Physical AI combines principles of robotics..."
+        section_ref:
+          type: string
+          description: Reference to the book section
+          example: "/docs/introduction"
+        page_reference:
+          type: string
+          description: Specific page or URL reference
+          example: "/docs/introduction#overview"
+
+    IndexContentResponse:
+      type: object
+      required:
+        - status
+        - indexed_count
+      properties:
+        status:
+          type: string
+          description: Status of the indexing operation
+          example: "success"
+        indexed_count:
+          type: integer
+          description: Number of content chunks successfully indexed
+          example: 42
+        skipped_count:
+          type: integer
+          description: Number of content chunks skipped (already indexed)
+          example: 0
+
+    StatusResponse:
+      type: object
+      required:
+        - overall_status
+        - services
+      properties:
+        overall_status:
+          type: string
+          enum: [healthy, degraded, unavailable]
+          description: Overall system health status
+          example: "healthy"
+        services:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ServiceStatus'
+          description: Status of individual services
+          example:
+            vector_db: { status: "healthy", last_checked: "2025-12-17T10:30:00Z" }
+            llm_service: { status: "healthy", last_checked: "2025-12-17T10:30:00Z" }
+            database: { status: "healthy", last_checked: "2025-12-17T10:30:00Z" }
+
+    ServiceStatus:
+      type: object
+      required:
+        - status
+        - last_checked
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unavailable]
+          description: Service health status
+          example: "healthy"
+        last_checked:
+          type: string
+          format: date-time
+          description: When the status was last checked
+          example: "2025-12-17T10:30:00Z"
+        details:
+          type: object
+          description: Additional status details
+          example: { response_time: 50, connections: 3 }
+        error_message:
+          type: string
+          description: Error message if service is not healthy
+          example: "Connection timeout"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - code
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid query format"
+        code:
+          type: integer
+          description: HTTP status code
+          example: 400
+        details:
+          type: object
+          description: Additional error details
+          example: { field: "query", reason: "Query cannot be empty" }
+
+    Message:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - timestamp
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the message
+          example: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+        role:
+          type: string
+          enum: [user, assistant]
+          description: Role of the message sender
+          example: "user"
+        content:
+          type: string
+          description: Content of the message
+          example: "What are the key principles of humanoid robotics?"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the message was created
+          example: "2025-12-17T10:32:00Z"
+        sources:
+          type: array
+          items:
+            type: object
+            required:
+              - content_id
+              - title
+              - page_reference
+            properties:
+              content_id:
+                type: string
+                description: Unique identifier for the referenced content
+                example: "content-001"
+              title:
+                type: string
+                description: Title of the referenced content
+                example: "Introduction to Humanoid Robotics"
+              page_reference:
+                type: string
+                description: Page or URL reference to the content
+                example: "/docs/introduction"

@@ -1,0 +1,121 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "physical-ai-rag-chatbot"
+version = "1.0.0"
+description = "RAG Chatbot for Physical AI and Humanoid Robotics Documentation"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Physical AI & Humanoid Robotics Project", email = "info@example.com"}
+]
+keywords = ["rag", "chatbot", "docusaurus", "physical-ai", "humanoid-robotics", "documentation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "sqlalchemy>=2.0.0",
+    "asyncpg>=0.29.0",  # For Postgres async support
+    "psycopg[binary]>=3.1.0",  # Postgres driver
+    "qdrant-client>=1.8.0",
+    "google-generativeai>=0.4.0",  # For Gemini API
+    "cohere>=4.9.0",
+    "python-multipart>=0.0.6",
+    "python-dotenv>=1.0.0",
+    "alembic>=1.13.0",
+    "pyjwt>=2.8.0",
+    "passlib[bcrypt]>=1.7.0",
+    "python-slugify>=8.0.0",
+    "httpx>=0.25.0",
+    "aiofiles>=23.0.0",
+    "tiktoken>=0.5.0",  # For token counting if needed
+    "loguru>=0.7.0",  # For structured logging
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "isort>=5.12.0",
+    "pre-commit>=3.5.0",
+    "jupyter>=1.0.0",
+    "notebook>=7.0.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.25.0",
+    "factory-boy>=3.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/physical-ai-and-humanoid-robotics-book"
+Repository = "https://github.com/your-org/physical-ai-and-humanoid-robotics-book"
+Documentation = "https://your-docs-url.com"
+
+[tool.setuptools.packages.find]
+where = ["backend/src"]
+
+[tool.setuptools.package-dir]
+"" = "backend/src"
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra"
+]
+
+[tool.coverage.run]
+source = ["src/"]
+omit = [
+    "*/tests/*",
+    "*/venv/*",
+    "*/__pycache__/*",
+    "*/migrations/*"
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+known_first_party = ["src"]
+known_third_party = ["fastapi", "uvicorn", "pydantic", "sqlalchemy", "qdrant_client", "google", "cohere", "pytest"]
