@@ -133,7 +133,7 @@ Thumbs.db
 .env.dev
 .env.test
 .env.prod
->>>>>>> 6544204 (added backend folder)
+6544204 (added backend folder)
 .env.development.local
 .env.test.local
 .env.production.local
@@ -141,3 +141,7 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/.env.example*
+.env.example
+.env
+/.env*
