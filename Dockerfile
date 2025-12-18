@@ -21,8 +21,9 @@ RUN npm run build
 # Install serve globally to serve the static files
 RUN npm install -g serve
 
-# Expose port
-EXPOSE $PORT
+# Set default port and expose it
+ENV PORT=3000
+EXPOSE 3000
 
 # Start serving the built static site
-CMD ["serve", "-s", "build", "-l", "$PORT"]
+CMD ["sh", "-c", "serve -s build -l tcp://0.0.0.0:$PORT"]
