@@ -197,7 +197,7 @@ const getBackendUrl = (): string => {
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       // IMPORTANT: Replace this URL with your actual Railway backend URL after deployment
       // Example: 'https://your-project-production.up.railway.app/api/v1'
-      const PRODUCTION_BACKEND_URL = 'https://your-railway-backend-production.up.railway.app/api/v1';
+      const PRODUCTION_BACKEND_URL = 'https://physical-ai-and-humanoid-robotics-book-production-f3fc.up.railway.app/api/v1';
       return PRODUCTION_BACKEND_URL;
     }
   }
