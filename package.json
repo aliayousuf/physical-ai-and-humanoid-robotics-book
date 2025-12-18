@@ -24,6 +24,8 @@
     "@types/react-dom": "^18.3.7",
     "@uiw/react-textarea-code-editor": "^2.0.0",
     "clsx": "^2.0.0",
+    "express": "^4.21.1",
+    "http-proxy-middleware": "^3.0.3",
     "prism-react-renderer": "^2.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

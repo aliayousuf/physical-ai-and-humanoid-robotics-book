@@ -134,4 +134,9 @@ async def ingest_docs(docs_dir: str = "../../../docs"):
 
 
 if __name__ == "__main__":
-    asyncio.run(ingest_docs())
+    import sys
+    if len(sys.argv) > 1:
+        docs_dir = sys.argv[1]
+    else:
+        docs_dir = "../docs"  # Default to docs directory in the parent folder
+    asyncio.run(ingest_docs(docs_dir))

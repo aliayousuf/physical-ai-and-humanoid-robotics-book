@@ -189,7 +189,24 @@ class ApiClient {
 }
 
 // Create a singleton instance
-export const apiClient = new ApiClient();
+// Use environment variable for production, fallback to relative path for development
+const getBackendUrl = (): string => {
+  // In browser environment
+  if (typeof window !== 'undefined') {
+    // If we're in production (not localhost), use the production backend URL
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      // IMPORTANT: Replace this URL with your actual Railway backend URL after deployment
+      // Example: 'https://your-project-production.up.railway.app/api/v1'
+      const PRODUCTION_BACKEND_URL = 'https://your-railway-backend-production.up.railway.app/api/v1';
+      return PRODUCTION_BACKEND_URL;
+    }
+  }
+
+  // Default to relative path for development (will be proxied by Docusaurus)
+  return '/api/v1';
+};
+
+export const apiClient = new ApiClient(getBackendUrl());
 
 // Export for direct use if needed
 export default apiClient;

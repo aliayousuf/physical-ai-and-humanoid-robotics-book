@@ -1,0 +1,9 @@
+# Railway configuration file
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "serve -s build -l $PORT"
+
+[variables]
+NODE_ENV = "production"

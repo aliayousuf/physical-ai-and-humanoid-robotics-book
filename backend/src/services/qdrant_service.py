@@ -30,7 +30,7 @@ class QdrantService:
             collection_names = [col.name for col in collections.collections]
 
             if self.collection_name not in collection_names:
-                # Create collection with appropriate vector size (assuming 1024-dim embeddings from Cohere)
+                # Create collection with appropriate vector size for Gemini embeddings
                 self.client.create_collection(
                     collection_name=self.collection_name,
                     vectors_config=models.VectorParams(
@@ -40,7 +40,21 @@ class QdrantService:
                 )
                 print(f"Created Qdrant collection: {self.collection_name}")
             else:
-                print(f"Qdrant collection {self.collection_name} already exists")
+                # Check the existing collection's configuration and recreate if dimensions don't match
+                collection_info = self.client.get_collection(self.collection_name)
+                if collection_info.config.params.vectors.size != 768:
+                    print(f"Collection dimension mismatch. Expected 768, got {collection_info.config.params.vectors.size}. Recreating collection...")
+                    self.client.delete_collection(self.collection_name)
+                    self.client.create_collection(
+                        collection_name=self.collection_name,
+                        vectors_config=models.VectorParams(
+                            size=768,  # Using 768 dimensions to match Gemini embedding dimensions
+                            distance=models.Distance.COSINE
+                        )
+                    )
+                    print(f"Recreated Qdrant collection: {self.collection_name} with correct dimensions")
+                else:
+                    print(f"Qdrant collection {self.collection_name} already exists with correct dimensions")
         except Exception as e:
             print(f"Error initializing Qdrant collection: {e}")
             raise
@@ -87,12 +101,20 @@ class QdrantService:
             # Handle different Qdrant client versions
             if hasattr(self.client, 'search'):
                 # Modern Qdrant client API
+                # First try with score threshold
                 results = self.client.search(
                     collection_name=self.collection_name,
                     query_vector=query_embedding,
                     limit=top_k,
                     score_threshold=score_threshold
                 )
+                # If no results with threshold, try without threshold to debug
+                if not results:
+                    results = self.client.search(
+                        collection_name=self.collection_name,
+                        query_vector=query_embedding,
+                        limit=top_k
+                    )
             elif hasattr(self.client, 'search_points'):
                 # Older Qdrant client API
                 results = self.client.search_points(
@@ -101,6 +123,13 @@ class QdrantService:
                     limit=top_k,
                     score_threshold=score_threshold
                 )
+                # If no results with threshold, try without threshold to debug
+                if not results:
+                    results = self.client.search_points(
+                        collection_name=self.collection_name,
+                        vector=query_embedding,
+                        limit=top_k
+                    )
             else:
                 # Fallback: return empty results instead of failing completely
                 print("Warning: Qdrant client doesn't have expected search method. Returning empty results.")

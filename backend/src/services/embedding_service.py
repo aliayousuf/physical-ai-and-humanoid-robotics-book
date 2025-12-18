@@ -13,7 +13,7 @@ class EmbeddingService:
 
         # Initialize the Google Generative AI Embeddings
         self.embeddings = GoogleGenerativeAIEmbeddings(
-            model=settings.gemini_model_name,
+            model=settings.gemini_embedding_model_name,
             google_api_key=settings.gemini_api_key
         )
 

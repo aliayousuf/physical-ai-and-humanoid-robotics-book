@@ -8,7 +8,7 @@ from ..utils.monitoring import check_service_usage, ServiceType
 class GeminiService:
     def __init__(self):
         genai.configure(api_key=settings.gemini_api_key)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
+        self.model = genai.GenerativeModel(settings.gemini_model_name)
         self.generation_config = genai.GenerationConfig(
             max_output_tokens=settings.max_response_tokens,
             temperature=0.7,

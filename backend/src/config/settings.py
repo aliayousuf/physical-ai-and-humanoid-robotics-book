@@ -50,6 +50,8 @@ class Settings(BaseSettings):
 
     # Model Configuration
     model_name: str = os.getenv("MODEL_NAME", "gemini-2.5-flash")  # Using Gemini 2.5 Flash
+    gemini_model_name: str = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")  # Using Gemini 2.5 Flash
+    gemini_embedding_model_name: str = os.getenv("GEMINI_EMBEDDING_MODEL_NAME", "text-embedding-004")  # Using embedding model
 
     class Config:
         env_file = ".env"

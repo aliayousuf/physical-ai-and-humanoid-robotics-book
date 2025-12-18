@@ -68,8 +68,6 @@ const config: Config = {
     ],
   ],
 
-<<<<<<< HEAD
-=======
   plugins: [
     // Add proxy configuration for development
     async function proxyPlugin() {
@@ -92,7 +90,6 @@ const config: Config = {
       };
     },
   ],
->>>>>>> 6544204 (added backend folder)
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
