@@ -6,7 +6,10 @@ from starlette.requests import Request
 import time
 
 from .chat import router as chat_router
+from .chat_api import router as chat_api_router  # Added for RAG chat functionality
 from .health import router as health_router
+from .ingestion import router as ingestion_router  # Added for book content ingestion
+from .search import router as search_router  # Added for semantic search functionality
 from ..middleware.rate_limit import rate_limit_middleware
 from ..utils.logging import logger, log_security_event
 
@@ -95,6 +98,9 @@ app.add_middleware(
 
 # Include routers
 app.include_router(chat_router, prefix="/api/v1/chat", tags=["chat"])
+app.include_router(chat_api_router, prefix="/api/v1", tags=["chat_api"])  # Added for RAG chat functionality
+app.include_router(ingestion_router, prefix="/api/v1", tags=["ingestion"])  # Added for book content ingestion
+app.include_router(search_router, prefix="/api/v1", tags=["search"])  # Added for semantic search functionality
 app.include_router(health_router, prefix="/api/v1", tags=["health"])
 
 # Log startup

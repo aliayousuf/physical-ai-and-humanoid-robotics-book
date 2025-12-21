@@ -51,7 +51,24 @@ class Settings(BaseSettings):
     # Model Configuration
     model_name: str = os.getenv("MODEL_NAME", "gemini-2.5-flash")  # Using Gemini 2.5 Flash
     gemini_model_name: str = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")  # Using Gemini 2.5 Flash
-    gemini_embedding_model_name: str = os.getenv("GEMINI_EMBEDDING_MODEL_NAME", "text-embedding-004")  # Using embedding model
+    gemini_embedding_model: str = os.getenv("GEMINI_EMBEDDING_MODEL", "text-embedding-004")  # Using embedding model
+
+    # Document Processing Configuration
+    docs_path: str = os.getenv("DOCS_PATH", "./docs")  # Path to the book content folder
+    chunk_size: int = int(os.getenv("CHUNK_SIZE", "1000"))  # Size of text chunks
+    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "200"))  # Overlap between chunks
+    max_chunk_size: int = int(os.getenv("MAX_CHUNK_SIZE", "1000"))
+    search_top_k: int = int(os.getenv("SEARCH_TOP_K", "5"))
+    search_score_threshold: float = float(os.getenv("SEARCH_SCORE_THRESHOLD", "0.3"))
+    docs_folder: str = os.getenv("DOCS_FOLDER", "./docs/")  # Path to book content folder
+
+    # CORS Configuration
+    allowed_origins: list = [
+        os.getenv("FRONTEND_URL", "http://localhost:3000"),
+        "http://localhost:8000",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:8000"
+    ]
 
     class Config:
         env_file = ".env"

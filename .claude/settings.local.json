@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from src.api.main import app; print\\(''Main app imported successfully''\\)\")"
+    ]
+  }
+}

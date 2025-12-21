@@ -98,41 +98,31 @@ class QdrantService:
             if not check_service_usage(ServiceType.QDRANT):
                 raise Exception("Qdrant API usage limit exceeded. Please try again later.")
 
-            # Handle different Qdrant client versions
-            if hasattr(self.client, 'search'):
-                # Modern Qdrant client API
-                # First try with score threshold
+            # Handle different Qdrant client versions - prioritize modern API
+            if hasattr(self.client, 'query_points'):
+                # Modern Qdrant client API (1.9.0+) - uses query_points for vector search
+                results = self.client.query_points(
+                    collection_name=self.collection_name,
+                    query=query_embedding,
+                    limit=top_k,
+                    score_threshold=score_threshold,
+                    with_payload=True
+                )
+                # Convert QueryResponse to list of results
+                if hasattr(results, 'points'):
+                    results = results.points
+            elif hasattr(self.client, 'search'):
+                # Older Qdrant client API
                 results = self.client.search(
                     collection_name=self.collection_name,
                     query_vector=query_embedding,
                     limit=top_k,
-                    score_threshold=score_threshold
+                    score_threshold=score_threshold,
+                    with_payload=True
                 )
-                # If no results with threshold, try without threshold to debug
-                if not results:
-                    results = self.client.search(
-                        collection_name=self.collection_name,
-                        query_vector=query_embedding,
-                        limit=top_k
-                    )
-            elif hasattr(self.client, 'search_points'):
-                # Older Qdrant client API
-                results = self.client.search_points(
-                    collection_name=self.collection_name,
-                    vector=query_embedding,
-                    limit=top_k,
-                    score_threshold=score_threshold
-                )
-                # If no results with threshold, try without threshold to debug
-                if not results:
-                    results = self.client.search_points(
-                        collection_name=self.collection_name,
-                        vector=query_embedding,
-                        limit=top_k
-                    )
             else:
                 # Fallback: return empty results instead of failing completely
-                print("Warning: Qdrant client doesn't have expected search method. Returning empty results.")
+                print("Warning: Qdrant client doesn't have expected query_points or search method. Returning empty results.")
                 return []
 
             # Format results

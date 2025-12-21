@@ -1,0 +1,173 @@
+openapi: 3.0.0
+info:
+  title: Book Content Ingestion API
+  description: API for ingesting book content into the vector database for the RAG chatbot using Gemini 2.5 Flash model
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Development server
+
+paths:
+  /api/v1/ingestion/trigger:
+    post:
+      summary: Trigger content ingestion from docs folder
+      description: Starts the process of ingesting all content from the docs folder into the vector database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                force_reprocess:
+                  type: boolean
+                  description: Whether to reprocess all documents even if already processed
+                  default: false
+                file_patterns:
+                  type: array
+                  items:
+                    type: string
+                  description: File patterns to include in ingestion (e.g., "*.md", "*.pdf")
+                  default: ["*.md", "*.pdf", "*.txt"]
+      responses:
+        '200':
+          description: Ingestion job started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionJobResponse'
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Internal server error during ingestion
+
+  /api/v1/ingestion/status/{job_id}:
+    get:
+      summary: Get ingestion job status
+      description: Retrieves the current status of an ingestion job
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the ingestion job
+      responses:
+        '200':
+          description: Ingestion job status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionJobResponse'
+        '404':
+          description: Ingestion job not found
+        '500':
+          description: Internal server error
+
+  /api/v1/chat/query:
+    post:
+      summary: Query the chatbot with book content
+      description: Send a query to the chatbot which will search the ingested book content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: The user's question/query
+                max_results:
+                  type: integer
+                  description: Maximum number of results to return
+                  default: 5
+                similarity_threshold:
+                  type: number
+                  description: Minimum similarity threshold for results
+                  default: 0.7
+      responses:
+        '200':
+          description: Chat response with relevant content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Invalid query parameters
+        '500':
+          description: Internal server error during query
+
+components:
+  schemas:
+    IngestionJobResponse:
+      type: object
+      properties:
+        job_id:
+          type: string
+          description: Unique identifier for the ingestion job
+        status:
+          type: string
+          description: Current status of the job
+          enum: [queued, running, completed, failed]
+        total_documents:
+          type: integer
+          description: Total number of documents to process
+        processed_documents:
+          type: integer
+          description: Number of documents processed so far
+        started_at:
+          type: string
+          format: date-time
+          description: When the job started
+        completed_at:
+          type: string
+          format: date-time
+          description: When the job completed (null if not completed)
+        error_message:
+          type: string
+          description: Error message if the job failed
+
+    ChatResponse:
+      type: object
+      properties:
+        response:
+          type: string
+          description: The chatbot's response to the query
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+        confidence:
+          type: number
+          description: Confidence score of the response
+
+    Source:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: Name of the source document
+        content:
+          type: string
+          description: Relevant content from the source
+        similarity_score:
+          type: number
+          description: Similarity score of this source to the query
+        metadata:
+          $ref: '#/components/schemas/SourceMetadata'
+
+    SourceMetadata:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Page number if from PDF
+        section:
+          type: string
+          description: Section title if available
+        chunk_index:
+          type: integer
+          description: Index of the chunk in the document

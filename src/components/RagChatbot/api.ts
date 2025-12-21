@@ -199,6 +199,9 @@ const getBackendUrl = (): string => {
       // Example: 'https://your-project-production.up.railway.app/api/v1'
       const PRODUCTION_BACKEND_URL = 'https://physical-ai-and-humanoid-robotics-book-production-f3fc.up.railway.app/api/v1';
       return PRODUCTION_BACKEND_URL;
+    } else {
+      // For local development, use the specific port where backend is running
+      return 'http://127.0.0.1:8003/api/v1';
     }
   }
 

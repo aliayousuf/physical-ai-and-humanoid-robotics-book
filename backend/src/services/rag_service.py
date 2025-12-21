@@ -135,7 +135,7 @@ class RAGService:
             query_text=query,
             response_text=response_text,
             query_mode=QueryMode.GENERAL,
-            response_sources=[ctx["content_id"] for ctx in context_content],
+            response_sources=[ctx["content_id"] for ctx in context_content if ctx.get("content_id")],
             response_time_ms=0,  # Would be calculated in a real implementation
             is_successful=True
         )
