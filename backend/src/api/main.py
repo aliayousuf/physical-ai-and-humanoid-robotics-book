@@ -90,7 +90,7 @@ app.middleware("http")(rate_limit_middleware)
 # Add CORS middleware for Docusaurus integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:8080", "https://your-docusaurus-site.com"],  # Docusaurus local and production origins
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:8080", "https://your-docusaurus-site.com", "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app/"],  # Docusaurus local and production origins
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
