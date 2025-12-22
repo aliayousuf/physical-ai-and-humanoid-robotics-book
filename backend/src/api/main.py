@@ -88,9 +88,29 @@ app.add_middleware(SecurityLoggingMiddleware)
 app.middleware("http")(rate_limit_middleware)
 
 # Add CORS middleware for Docusaurus integration
+# Allow environment-specific origins
+import os
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:8080",
+    "https://your-docusaurus-site.com"
+]
+
+# Add production frontend URL from environment variable if available
+production_frontend_url = os.getenv("FRONTEND_URL")
+if production_frontend_url:
+    allowed_origins.append(production_frontend_url.rstrip('/'))  # Remove trailing slash if present
+else:
+    # Default production URLs - update these to match your actual deployments
+    allowed_origins.extend([
+        "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app",
+        "https://physical-ai-and-humanoid-robotics-book.vercel.app"  # common Vercel deployment URL
+    ])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:8080", "https://your-docusaurus-site.com", "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app/"],  # Docusaurus local and production origins
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],

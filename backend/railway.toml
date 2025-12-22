@@ -1,0 +1,11 @@
+# Railway configuration file for Python FastAPI Backend
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "python -m uvicorn src.api.main:app --host 0.0.0.0 --port $PORT"
+runInDir = "."
+
+[variables]
+PORT = "8000"

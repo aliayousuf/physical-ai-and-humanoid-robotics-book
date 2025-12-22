@@ -195,13 +195,14 @@ const getBackendUrl = (): string => {
   if (typeof window !== 'undefined') {
     // If we're in production (not localhost), use the production backend URL
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      // IMPORTANT: Replace this URL with your actual Railway backend URL after deployment
-      // Example: 'https://your-project-production.up.railway.app/api/v1'
-      const PRODUCTION_BACKEND_URL = 'https://physical-ai-and-humanoid-robotics-book-production-27aa.up.railway.app/api/v1';
-      return PRODUCTION_BACKEND_URL;
+      // Use environment variable if available, otherwise fall back to known Railway URL
+      const productionBackendUrl = process.env.REACT_APP_BACKEND_URL ||
+                                   process.env.NEXT_PUBLIC_BACKEND_URL ||
+                                   'https://physical-ai-and-humanoid-robotics-book-production-27aa.up.railway.app/api/v1';
+      return productionBackendUrl;
     } else {
       // For local development, use the specific port where backend is running
-      return 'http://127.0.0.1:8003/api/v1';
+      return 'http://127.0.0.1:8000/api/v1';
     }
   }
 

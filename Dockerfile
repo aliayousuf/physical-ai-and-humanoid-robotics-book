@@ -26,4 +26,4 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Start serving the built static site
-CMD ["sh", "-c", "serve -s build -l tcp://0.0.0.0:$PORT"]
+CMD ["sh", "-c", "serve -s build --listen $PORT"]

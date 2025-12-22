@@ -1,9 +1,8 @@
-# Railway configuration file
+# Railway configuration file for Docusaurus Frontend
 [build]
-builder = "dockerfile"
-
-[deploy]
-startCommand = "serve -s build -l tcp://0.0.0.0:${PORT:-3000}"
+builder = "nixpacks"
+buildCommand = "npm run build"
+startCommand = "serve -s build --listen ${PORT:-3000}"
 
 [variables]
 NODE_ENV = "production"
