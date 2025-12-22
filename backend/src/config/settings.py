@@ -63,27 +63,7 @@ class Settings(BaseSettings):
     docs_folder: str = os.getenv("DOCS_FOLDER", "./docs/")  # Path to book content folder
 
     # CORS Configuration
-    @property
-    def allowed_origins(self) -> list:
-        origins = [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://localhost:8080",
-            "https://your-docusaurus-site.com"
-        ]
-
-        # Add production frontend URL from environment variable if available
-        production_frontend_url = os.getenv("FRONTEND_URL")
-        if production_frontend_url:
-            origins.append(production_frontend_url.rstrip('/'))
-        else:
-            # Default production URLs - update these to match your actual deployments
-            origins.extend([
-                "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app",
-                "https://physical-ai-and-humanoid-robotics-book.vercel.app"
-            ])
-
-        return origins
+    frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
     class Config:
         env_file = ".env"
@@ -91,3 +71,26 @@ class Settings(BaseSettings):
 
 # Create a single instance of settings
 settings = Settings()
+
+
+# Function to get allowed origins dynamically
+def get_allowed_origins() -> list:
+    origins = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:8080",
+        "https://your-docusaurus-site.com"
+    ]
+
+    # Add production frontend URL from environment variable if available
+    production_frontend_url = os.getenv("FRONTEND_URL")
+    if production_frontend_url:
+        origins.append(production_frontend_url.rstrip('/'))
+    else:
+        # Default production URLs - update these to match your actual deployments
+        origins.extend([
+            "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app",
+            "https://physical-ai-and-humanoid-robotics-book.vercel.app"
+        ])
+
+    return origins

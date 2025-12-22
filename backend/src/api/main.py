@@ -87,12 +87,12 @@ app.add_middleware(SecurityLoggingMiddleware)
 # Add custom rate limiting middleware
 app.middleware("http")(rate_limit_middleware)
 
-from ..config.settings import settings
+from ..config.settings import get_allowed_origins
 
 # Add CORS middleware for Docusaurus integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
