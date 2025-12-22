@@ -87,30 +87,12 @@ app.add_middleware(SecurityLoggingMiddleware)
 # Add custom rate limiting middleware
 app.middleware("http")(rate_limit_middleware)
 
+from ..config.settings import settings
+
 # Add CORS middleware for Docusaurus integration
-# Allow environment-specific origins
-import os
-allowed_origins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:8080",
-    "https://your-docusaurus-site.com"
-]
-
-# Add production frontend URL from environment variable if available
-production_frontend_url = os.getenv("FRONTEND_URL")
-if production_frontend_url:
-    allowed_origins.append(production_frontend_url.rstrip('/'))  # Remove trailing slash if present
-else:
-    # Default production URLs - update these to match your actual deployments
-    allowed_origins.extend([
-        "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app",
-        "https://physical-ai-and-humanoid-robotics-book.vercel.app"  # common Vercel deployment URL
-    ])
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -128,4 +110,6 @@ logger.info("RAG Chatbot API started successfully")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
