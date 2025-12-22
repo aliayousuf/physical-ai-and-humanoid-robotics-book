@@ -31,4 +31,4 @@ USER appuser
 EXPOSE 8000
 
 # Run the application
-CMD ["gunicorn", "--worker-class", "uvicorn.workers.UvicornWorker", "--workers", "4", "--bind", "0.0.0.0:8000", "src.api.main:app"]
+CMD ["sh", "-c", "uvicorn src.api.main:app --host 0.0.0.0 --port $PORT"]
