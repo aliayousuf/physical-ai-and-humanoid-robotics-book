@@ -8,20 +8,35 @@ from ..utils.monitoring import check_service_usage, ServiceType
 
 class EmbeddingService:
     def __init__(self):
-        # Configure the Google Generative AI
-        genai.configure(api_key=settings.gemini_api_key)
+        if settings.gemini_api_key:
+            try:
+                # Configure the Google Generative AI
+                genai.configure(api_key=settings.gemini_api_key)
 
-        # Initialize the Google Generative AI Embeddings
-        self.embeddings = GoogleGenerativeAIEmbeddings(
-            model=settings.gemini_embedding_model,
-            google_api_key=settings.gemini_api_key
-        )
+                # Initialize the Google Generative AI Embeddings
+                self.embeddings = GoogleGenerativeAIEmbeddings(
+                    model=settings.gemini_embedding_model,
+                    google_api_key=settings.gemini_api_key
+                )
+                self.is_available = True
+            except Exception as e:
+                print(f"Warning: Could not configure EmbeddingService: {e}")
+                self.is_available = False
+                self.embeddings = None
+        else:
+            print("Warning: Gemini API key not provided to EmbeddingService")
+            self.is_available = False
+            self.embeddings = None
 
     async def generate_embeddings(self, texts: List[str], input_type: str = "search_document") -> List[List[float]]:
         """
         Generate embeddings for a list of texts using Google Gemini
         With caching for frequently accessed embeddings
         """
+        if not self.is_available:
+            print("EmbeddingService not available, returning empty results")
+            return [[] for _ in texts]  # Return empty embeddings for each text
+
         # Check usage limits before making API call
         if not check_service_usage(ServiceType.GEMINI):
             raise Exception("Gemini API usage limit exceeded. Please try again later.")
@@ -63,6 +78,10 @@ class EmbeddingService:
         """
         Generate embedding for a single text using Google Gemini
         """
+        if not self.is_available:
+            print("EmbeddingService not available, returning empty embedding")
+            return []  # Return empty embedding
+
         # Check cache first
         cache_key = f"embedding_{text[:50]}_{input_type}"
         cached_result = embeddings_cache.get(cache_key)
@@ -84,5 +103,22 @@ class EmbeddingService:
             raise
 
 
-# Global instance
-embedding_service = EmbeddingService()
+# Global instance with error handling
+try:
+    embedding_service = EmbeddingService()
+except Exception as e:
+    print(f"Warning: Could not initialize EmbeddingService: {e}")
+    # Create a mock service that indicates it's not available
+    class MockEmbeddingService:
+        def __init__(self):
+            self.is_available = False
+
+        async def generate_embeddings(self, texts, input_type="search_document"):
+            print("EmbeddingService not available, returning empty results")
+            return [[] for _ in texts]
+
+        async def embed_single_text(self, text, input_type="search_document"):
+            print("EmbeddingService not available, returning empty embedding")
+            return []
+
+    embedding_service = MockEmbeddingService()

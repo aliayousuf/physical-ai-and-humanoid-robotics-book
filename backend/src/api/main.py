@@ -105,6 +105,11 @@ app.include_router(ingestion_router, prefix="/api/v1", tags=["ingestion"])  # Ad
 app.include_router(search_router, prefix="/api/v1", tags=["search"])  # Added for semantic search functionality
 app.include_router(health_router, prefix="/api/v1", tags=["health"])
 
+# Add a root endpoint
+@app.get("/")
+async def root():
+    return {"message": "RAG Chatbot API is running", "status": "healthy"}
+
 # Log startup
 logger.info("RAG Chatbot API started successfully")
 

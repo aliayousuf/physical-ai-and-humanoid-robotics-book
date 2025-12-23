@@ -32,7 +32,10 @@ class VectorDBService:
             print("Please ensure Qdrant server is running before starting the application.")
             print("For local setup, install Docker and run: docker run -p 6333:6333 qdrant/qdrant")
             print("Alternatively, use Qdrant Cloud: https://cloud.qdrant.io/")
-            raise e  # Re-raise the exception to prevent the application from starting with broken vector DB
+            # Don't raise the exception - allow the app to start with a disabled vector DB
+            self.client = None
+            self.collection_name = settings.qdrant_collection_name
+            logger.warning("VectorDBService initialized in disabled state due to Qdrant connection issues")
 
     def _ensure_collection_exists(self):
         """
@@ -246,5 +249,31 @@ class VectorDBService:
             logger.error(f"Error retrieving document IDs: {str(e)}")
             return []
 
-# Create a singleton instance
-vector_db_service = VectorDBService()
+# Create a singleton instance with error handling
+try:
+    vector_db_service = VectorDBService()
+except Exception as e:
+    logger.error(f"Could not initialize VectorDBService: {e}")
+    # Create a mock service that indicates it's not available
+    class MockVectorDBService:
+        def __init__(self):
+            self.client = None
+            self.collection_name = "mock_collection"
+
+        def store_embedding(self, chunk, embedding):
+            logger.warning("VectorDBService not available, cannot store embedding")
+            return False
+
+        def search_similar(self, query_embedding, top_k=5, threshold=0.3):
+            logger.warning("VectorDBService not available, returning empty results")
+            return []
+
+        def delete_document_chunks(self, document_id):
+            logger.warning("VectorDBService not available, cannot delete document chunks")
+            return False
+
+        def get_all_document_ids(self):
+            logger.warning("VectorDBService not available, returning empty list")
+            return []
+
+    vector_db_service = MockVectorDBService()

@@ -16,14 +16,32 @@ class ChatService:
     Service for RAG (Retrieval Augmented Generation) functionality using Gemini
     """
     def __init__(self):
-        # Configure the API key
-        genai.configure(api_key=settings.gemini_api_key)
-        self.model = genai.GenerativeModel(settings.gemini_model_name)
+        if settings.gemini_api_key:
+            try:
+                genai.configure(api_key=settings.gemini_api_key)
+                self.model = genai.GenerativeModel(settings.gemini_model_name)
+                self.is_available = True
+            except Exception as e:
+                logger.error(f"Could not configure Gemini in ChatService: {e}")
+                self.is_available = False
+                self.model = None
+        else:
+            logger.warning("Gemini API key not provided to ChatService")
+            self.is_available = False
+            self.model = None
 
     async def query_chat(self, query: str, max_results: int = 5, similarity_threshold: float = 0.3) -> Dict[str, Any]:
         """
         Query the chatbot with book content using RAG approach
         """
+        if not self.is_available:
+            logger.warning("ChatService not available, returning error response")
+            return {
+                "response": "Chat service is not available. Please configure the API keys.",
+                "sources": [],
+                "confidence": 0.0
+            }
+
         try:
             # Generate embedding for the query
             query_embedding = await embedding_service.embed_single_text(query, input_type="retrieval_query")
@@ -109,6 +127,10 @@ class ChatService:
         """
         Get relevant content from the vector database without generating a response
         """
+        if not self.is_available:
+            logger.warning("ChatService not available, returning empty results")
+            return []
+
         try:
             # Generate embedding for the query
             query_embedding = await embedding_service.embed_single_text(query, input_type="retrieval_query")
@@ -125,5 +147,26 @@ class ChatService:
             logger.error(f"Error getting relevant content: {str(e)}")
             return []
 
-# Create a singleton instance
-chat_service = ChatService()
+# Create a singleton instance with error handling
+try:
+    chat_service = ChatService()
+except Exception as e:
+    logger.error(f"Could not initialize ChatService: {e}")
+    # Create a mock service that indicates it's not available
+    class MockChatService:
+        def __init__(self):
+            self.is_available = False
+
+        async def query_chat(self, query, max_results=5, similarity_threshold=0.3):
+            logger.warning("ChatService not available, returning error response")
+            return {
+                "response": "Chat service is not available. Please configure the API keys.",
+                "sources": [],
+                "confidence": 0.0
+            }
+
+        async def get_relevant_content(self, query, max_results=5, similarity_threshold=0.3):
+            logger.warning("ChatService not available, returning empty results")
+            return []
+
+    chat_service = MockChatService()
