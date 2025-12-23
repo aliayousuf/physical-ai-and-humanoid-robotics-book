@@ -9,17 +9,34 @@ from ..utils.monitoring import check_service_usage, ServiceType
 
 class QdrantService:
     def __init__(self):
-        self.client = QdrantClient(
-            url=settings.qdrant_url,
-            api_key=settings.qdrant_api_key,
-            prefer_grpc=False  # Using HTTP for simplicity
-        )
+        # Only initialize client if required settings are available
+        if settings.qdrant_url and settings.qdrant_api_key:
+            try:
+                self.client = QdrantClient(
+                    url=settings.qdrant_url,
+                    api_key=settings.qdrant_api_key,
+                    prefer_grpc=False  # Using HTTP for simplicity
+                )
+                self.is_available = True
+            except Exception as e:
+                print(f"Warning: Could not connect to Qdrant: {e}")
+                self.is_available = False
+                self.client = None
+        else:
+            print("Warning: Qdrant configuration not provided, service will be unavailable")
+            self.is_available = False
+            self.client = None
+
         self.collection_name = "book_content"
 
     async def initialize_collection(self):
         """
         Initialize the Qdrant collection for book content
         """
+        if not self.is_available:
+            print("Qdrant service not available, skipping initialization")
+            return
+
         try:
             # Check usage limits before making API call
             if not check_service_usage(ServiceType.QDRANT):
@@ -63,6 +80,10 @@ class QdrantService:
         """
         Store an embedding in Qdrant
         """
+        if not self.is_available:
+            print("Qdrant service not available, cannot store embedding")
+            raise Exception("Qdrant service not available")
+
         try:
             # Check usage limits before making API call
             if not check_service_usage(ServiceType.QDRANT):
@@ -93,6 +114,10 @@ class QdrantService:
         """
         Search for similar content based on embedding
         """
+        if not self.is_available:
+            print("Qdrant service not available, returning empty search results")
+            return []
+
         try:
             # Check usage limits before making API call
             if not check_service_usage(ServiceType.QDRANT):
@@ -144,6 +169,10 @@ class QdrantService:
         """
         Delete an embedding from Qdrant
         """
+        if not self.is_available:
+            print("Qdrant service not available, cannot delete embedding")
+            raise Exception("Qdrant service not available")
+
         try:
             # Check usage limits before making API call
             if not check_service_usage(ServiceType.QDRANT):
@@ -163,6 +192,10 @@ class QdrantService:
         """
         Update an existing embedding in Qdrant
         """
+        if not self.is_available:
+            print("Qdrant service not available, cannot update embedding")
+            raise Exception("Qdrant service not available")
+
         try:
             # Check usage limits before making API call
             if not check_service_usage(ServiceType.QDRANT):
@@ -183,5 +216,34 @@ class QdrantService:
             raise
 
 
-# Global instance
-qdrant_service = QdrantService()
+# Global instance with error handling
+try:
+    qdrant_service = QdrantService()
+except Exception as e:
+    print(f"Warning: Could not initialize Qdrant service: {e}")
+    # Create a mock service that indicates it's not available
+    class MockQdrantService:
+        def __init__(self):
+            self.is_available = False
+
+        async def initialize_collection(self):
+            print("Qdrant service not available, skipping initialization")
+            return
+
+        async def store_embedding(self, content_id, embedding, metadata):
+            print("Qdrant service not available, cannot store embedding")
+            raise Exception("Qdrant service not available")
+
+        async def search_similar(self, query_embedding, top_k=5, score_threshold=0.5):
+            print("Qdrant service not available, returning empty search results")
+            return []
+
+        async def delete_embedding(self, point_id):
+            print("Qdrant service not available, cannot delete embedding")
+            raise Exception("Qdrant service not available")
+
+        async def update_embedding(self, point_id, embedding, metadata):
+            print("Qdrant service not available, cannot update embedding")
+            raise Exception("Qdrant service not available")
+
+    qdrant_service = MockQdrantService()

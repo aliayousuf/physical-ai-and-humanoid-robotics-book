@@ -2,7 +2,7 @@
 [build]
 builder = "nixpacks"
 buildCommand = "cd backend && pip install -r requirements.txt"
-startCommand = "cd backend && python -m src.scripts.initialize_vector_db 2>/dev/null || echo 'Vector DB initialization skipped' && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
+startCommand = "cd backend && timeout 30 python -m src.scripts.initialize_vector_db || echo 'Vector DB initialization skipped or timed out' && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
 
 [variables]
 NODE_ENV = "production"

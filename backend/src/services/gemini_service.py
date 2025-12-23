@@ -7,17 +7,34 @@ from ..utils.monitoring import check_service_usage, ServiceType
 
 class GeminiService:
     def __init__(self):
-        genai.configure(api_key=settings.gemini_api_key)
-        self.model = genai.GenerativeModel(settings.gemini_model_name)
-        self.generation_config = genai.GenerationConfig(
-            max_output_tokens=settings.max_response_tokens,
-            temperature=0.7,
-        )
+        if settings.gemini_api_key:
+            try:
+                genai.configure(api_key=settings.gemini_api_key)
+                self.model = genai.GenerativeModel(settings.gemini_model_name)
+                self.generation_config = genai.GenerationConfig(
+                    max_output_tokens=settings.max_response_tokens,
+                    temperature=0.7,
+                )
+                self.is_available = True
+            except Exception as e:
+                print(f"Warning: Could not configure Gemini service: {e}")
+                self.is_available = False
+                self.model = None
+                self.generation_config = None
+        else:
+            print("Warning: Gemini API key not provided, service will be unavailable")
+            self.is_available = False
+            self.model = None
+            self.generation_config = None
 
     async def generate_response(self, prompt: str, context: Optional[List[Dict[str, str]]] = None) -> str:
         """
         Generate a response using the Gemini model
         """
+        if not self.is_available:
+            print("Gemini service not available, cannot generate response")
+            raise Exception("Gemini service not available")
+
         # Check usage limits before making API call
         if not check_service_usage(ServiceType.GEMINI):
             raise Exception("Gemini API usage limit exceeded. Please try again later.")
@@ -60,6 +77,10 @@ class GeminiService:
         """
         Generate embedding for content using Gemini's embedding model
         """
+        if not self.is_available:
+            print("Gemini service not available, cannot generate embedding")
+            raise Exception("Gemini service not available")
+
         # Check usage limits before making API call
         if not check_service_usage(ServiceType.GEMINI):
             raise Exception("Gemini API usage limit exceeded. Please try again later.")
@@ -81,5 +102,22 @@ class GeminiService:
             raise
 
 
-# Global instance
-gemini_service = GeminiService()
+# Global instance with error handling
+try:
+    gemini_service = GeminiService()
+except Exception as e:
+    print(f"Warning: Could not initialize Gemini service: {e}")
+    # Create a mock service that indicates it's not available
+    class MockGeminiService:
+        def __init__(self):
+            self.is_available = False
+
+        async def generate_response(self, prompt, context=None):
+            print("Gemini service not available, cannot generate response")
+            raise Exception("Gemini service not available")
+
+        async def embed_content(self, content):
+            print("Gemini service not available, cannot generate embedding")
+            raise Exception("Gemini service not available")
+
+    gemini_service = MockGeminiService()
