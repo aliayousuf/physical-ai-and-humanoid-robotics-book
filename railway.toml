@@ -1,8 +1,8 @@
-# Railway configuration file for Docusaurus Frontend
+# Railway configuration file - Build and run proxy server
 [build]
 builder = "nixpacks"
-buildCommand = "npm run build"
-startCommand = "serve -s build --listen ${PORT:-3000}"
+buildCommand = "cd backend && pip install -r requirements.txt && cd .. && npm install && npm run build"
+startCommand = "bash start.sh"
 
 [variables]
 NODE_ENV = "production"
