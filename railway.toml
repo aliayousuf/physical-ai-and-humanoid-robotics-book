@@ -4,8 +4,7 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "python start_server.py"
+startCommand = "python simple_server.py"
 
 [variables]
-PORT = "8000"
 NODE_ENV = "production"

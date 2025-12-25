@@ -16,7 +16,8 @@ def run_initialization():
         os.chdir(backend_path)
 
         # Add to Python path
-        sys.path.insert(0, str(backend_path))
+        if str(backend_path) not in sys.path:
+            sys.path.insert(0, str(backend_path))
 
         # Import and run initialization
         from src.scripts.initialize_vector_db import initialize_vector_db
@@ -27,18 +28,28 @@ def run_initialization():
 
 def main():
     print("Starting server initialization...")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Environment variables: {dict(os.environ)}")
+
+    # Get port from environment - Railway should set this
+    port_env = os.environ.get("PORT")
+    if port_env is None:
+        print("ERROR: PORT environment variable not set by Railway")
+        sys.exit(1)
+
+    port = int(port_env)
+    print(f"Using Railway-assigned port: {port}")
 
     # Run initialization
     run_initialization()
 
-    # Get port from environment
-    port = int(os.environ.get("PORT", "8000"))
-    print(f"Using port: {port}")
-
     # Change to backend directory for running the app
     backend_path = Path("/app/backend")
     os.chdir(backend_path)
-    sys.path.insert(0, str(backend_path))
+    print(f"Changed to backend directory: {os.getcwd()}")
+
+    if str(backend_path) not in sys.path:
+        sys.path.insert(0, str(backend_path))
 
     print(f"Starting FastAPI app on 0.0.0.0:{port}")
 

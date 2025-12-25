@@ -17,10 +17,9 @@ RUN if [ -f "backend/requirements.txt" ]; then \
         cd backend && pip install --no-cache-dir --break-system-packages -r requirements.txt; \
     fi
 
-# Set default port and expose it
-ENV PORT=8000
+# Expose port (Railway will assign the actual port)
 EXPOSE 8000
 
 # Default command that can be overridden by Railway
 WORKDIR /app
-CMD ["python", "simple_server.py"]
+CMD ["python", "/app/simple_server.py"]
