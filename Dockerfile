@@ -22,4 +22,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Default command that can be overridden by Railway
-CMD ["sh", "-c", "cd backend && if [ -f 'src/scripts/initialize_vector_db.py' ]; then timeout 30 python -m src.scripts.initialize_vector_db || echo 'Vector DB initialization skipped or timed out'; fi && exec uvicorn main:app --host 0.0.0.0 --port $PORT"]
+CMD ["python", "start_server.py"]

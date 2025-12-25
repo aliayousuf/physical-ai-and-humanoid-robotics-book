@@ -4,7 +4,7 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "cd /app/backend && timeout 30 python -m src.scripts.initialize_vector_db || echo 'Vector DB initialization skipped or timed out' && cd /app/backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+startCommand = "python start_server.py"
 
 [variables]
 PORT = "8000"
