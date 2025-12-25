@@ -39,15 +39,21 @@ def start_server():
     if str(backend_path) not in sys.path:
         sys.path.insert(0, str(backend_path))
 
-    # Get the port from environment - Railway always sets this
-    # If not set, this is an error in Railway deployment
+    # Try to get the port from environment (Railway) or settings
     port_env = os.environ.get("PORT")
-    if port_env is None:
-        print("ERROR: PORT environment variable not set by Railway")
-        sys.exit(1)
+    if port_env is not None:
+        port = int(port_env)
+        print(f"Using PORT from environment: {port}")
+    else:
+        # Fallback to importing settings to get the port
+        try:
+            from src.config.settings import settings
+            port = settings.port
+            print(f"Using PORT from settings: {port}")
+        except ImportError:
+            print("ERROR: Could not get port from environment or settings")
+            sys.exit(1)
 
-    port = int(port_env)
-    print(f"Environment PORT variable: {port_env}")
     print(f"Starting server on port {port}")
     print(f"Host: 0.0.0.0 (binding to all interfaces)")
 
@@ -55,7 +61,7 @@ def start_server():
     uvicorn.run(
         "main:app",
         host="0.0.0.0",  # Bind to all interfaces
-        port=port,        # Use the port provided by Railway
+        port=port,        # Use the port from environment or settings
         reload=False,
         log_level="info",
         access_log=True,
