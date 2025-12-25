@@ -4,7 +4,7 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "sh -c 'python -m uvicorn backend.src.api.main:app --host 0.0.0.0 --port ${PORT:-8000}'"
+startCommand = "sh -c 'cd /app/backend && python -m uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000}'"
 
 [variables]
 NODE_ENV = "production"
