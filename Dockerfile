@@ -14,7 +14,7 @@ RUN npm install && npm run build || echo "Frontend build failed, continuing..."
 
 # Install Python dependencies for backend
 RUN if [ -f "backend/requirements.txt" ]; then \
-        cd backend && pip install --no-cache-dir -r requirements.txt; \
+        cd backend && pip install --no-cache-dir --break-system-packages -r requirements.txt; \
     fi
 
 # Set default port and expose it
