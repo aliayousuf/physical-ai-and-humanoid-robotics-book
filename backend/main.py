@@ -7,7 +7,7 @@ from src.api.chat_api import router as chat_router
 from src.api.ingestion_api import router as ingestion_router
 from src.api.health_api import router as health_router
 from src.api.search import router as search_router  # Added for semantic search functionality
-from src.config.settings import settings
+from src.config.settings import settings, get_allowed_origins
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -35,7 +35,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
