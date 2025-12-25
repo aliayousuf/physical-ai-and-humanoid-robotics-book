@@ -30,6 +30,7 @@ def initialize_vector_db():
 def start_server():
     """Start the uvicorn server"""
     import uvicorn
+    import os
 
     # Change to the backend directory
     backend_path = Path("/app/backend")
@@ -40,6 +41,7 @@ def start_server():
 
     # Get the port from environment - Railway always sets this
     port = int(os.environ.get("PORT", "8000"))
+    print(f"Environment PORT variable: {os.environ.get('PORT', 'not set')}")
     print(f"Starting server on port {port}")
 
     # Start the server
