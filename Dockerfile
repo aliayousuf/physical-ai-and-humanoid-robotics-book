@@ -23,4 +23,4 @@ EXPOSE 8000
 
 # Default command that can be overridden by Railway
 WORKDIR /app
-CMD ["python", "start_server.py"]
+CMD ["python", "simple_server.py"]
