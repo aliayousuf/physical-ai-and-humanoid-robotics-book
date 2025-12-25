@@ -22,5 +22,5 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Default command that can be overridden by Railway
-WORKDIR /app/backend
-CMD ["python", "/app/start_server.py"]
+WORKDIR /app
+CMD ["python", "start_server.py"]
