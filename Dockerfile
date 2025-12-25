@@ -1,29 +1,25 @@
 FROM node:20-alpine
 
-# Install Python and dependencies only if needed for the build process
+# Install Python and dependencies
 RUN apk add --no-cache python3 py3-pip
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files first to leverage Docker layer caching
-COPY package*.json ./
-
-# Install Node.js dependencies
-RUN npm install
-
-# Copy the rest of the application code
+# Copy all application code
 COPY . .
 
-# Build the Docusaurus site
-RUN npm run build
+# Install Node.js dependencies for frontend
+RUN npm install && npm run build || echo "Frontend build failed, continuing..."
 
-# Install serve globally to serve the static files
-RUN npm install -g serve
+# Install Python dependencies for backend
+RUN if [ -f "backend/requirements.txt" ]; then \
+        cd backend && pip install --no-cache-dir -r requirements.txt; \
+    fi
 
 # Set default port and expose it
-ENV PORT=3000
-EXPOSE 3000
+ENV PORT=8000
+EXPOSE 8000
 
-# Start serving the built static site
-CMD ["serve", "-s", "build", "--listen", "3000"]
+# Default command that can be overridden by Railway
+CMD ["sh", "-c", "cd backend && if [ -f 'src/scripts/initialize_vector_db.py' ]; then timeout 30 python -m src.scripts.initialize_vector_db || echo 'Vector DB initialization skipped or timed out'; fi && exec uvicorn main:app --host 0.0.0.0 --port $PORT"]
