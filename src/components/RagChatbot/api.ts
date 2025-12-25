@@ -190,17 +190,14 @@ class ApiClient {
 }
 
 // Create a singleton instance
-// Use environment variable for production, fallback to relative path for development
+// Always use relative path to work with Vercel proxying in production
 const getBackendUrl = (): string => {
   // In browser environment
   if (typeof window !== 'undefined') {
-    // If we're in production (not localhost), use the production backend URL
+    // Always use relative path in production to work with Vercel proxying
+    // Vercel will proxy /api/v1/* requests to the actual backend
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      // Use environment variable if available, otherwise fall back to known Railway URL
-      const productionBackendUrl = process.env.REACT_APP_BACKEND_URL ||
-                                   process.env.NEXT_PUBLIC_BACKEND_URL ||
-                                   'https://physical-ai-and-humanoid-robotics-book-production-27aa.up.railway.app/api/v1';
-      return productionBackendUrl;
+      return '/api/v1';
     } else {
       // For local development, use the specific port where backend is running
       return 'http://127.0.0.1:8000/api/v1';
