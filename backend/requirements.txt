@@ -13,7 +13,7 @@ google-generativeai>=0.4.0
 # Cohere dependency removed - switching to Google Gemini embeddings
 python-multipart>=0.0.6
 python-dotenv>=1.0.0
-alembic>=1.13.0
+alembic>=1.3.0
 pyjwt>=2.8.0
 passlib[bcrypt]>=1.7.0
 python-slugify>=8.0.0
@@ -21,5 +21,7 @@ httpx>=0.25.0
 aiofiles>=23.0.0
 tiktoken>=0.5.0
 loguru>=0.7.0
+pypdf>=4.0.0
+markdown>=3.0.0
 pytest>=7.4.0
 pytest-asyncio>=0.21.0

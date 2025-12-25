@@ -1,4 +1,4 @@
-import PyPDF2
+from pypdf import PdfReader
 import markdown
 from typing import List, Dict, Any
 import os
@@ -11,7 +11,7 @@ def parse_pdf(file_path: str) -> str:
     text = ""
     try:
         with open(file_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
+            pdf_reader = PdfReader(file)
             for page in pdf_reader.pages:
                 text += page.extract_text() + "\n"
     except Exception as e:
