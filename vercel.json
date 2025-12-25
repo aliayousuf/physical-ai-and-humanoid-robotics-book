@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "https://physical-ai-and-humanoid-robotics-book-production-27aa.up.railway.app/api/v1/:path*"
+    }
+  ]
+}

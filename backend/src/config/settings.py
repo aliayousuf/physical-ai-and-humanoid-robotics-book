@@ -86,11 +86,21 @@ def get_allowed_origins() -> list:
     production_frontend_url = os.getenv("FRONTEND_URL")
     if production_frontend_url:
         origins.append(production_frontend_url.rstrip('/'))
-    else:
-        # Default production URLs - update these to match your actual deployments
-        origins.extend([
-            "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app",
-            "https://physical-ai-and-humanoid-robotics-book.vercel.app"
-        ])
 
-    return origins
+    # Add common Vercel deployment patterns
+    origins.extend([
+        "https://physical-ai-and-humanoid-robotics-b-chi.vercel.app",
+        "https://physical-ai-and-humanoid-robotics-book.vercel.app",
+        "https://*.vercel.app",  # Allow any vercel subdomain
+        "https://physical-ai-humanoid-robotics-book.vercel.app"  # Another possible pattern
+    ])
+
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_origins = []
+    for origin in origins:
+        if origin not in seen:
+            seen.add(origin)
+            unique_origins.append(origin)
+
+    return unique_origins
