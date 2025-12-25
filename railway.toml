@@ -1,8 +1,8 @@
 # Railway configuration file for Backend API
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && pip install -r requirements.txt"
-startCommand = "cd backend && timeout 30 python -m src.scripts.initialize_vector_db || echo 'Vector DB initialization skipped or timed out' && exec uvicorn main:app --host 0.0.0.0 --port $PORT"
+buildCommand = "python -c \"import os; os.chdir('backend'); import subprocess; subprocess.run(['pip', 'install', '-r', 'requirements.txt'])\""
+startCommand = "python -c \"import os, subprocess, sys; os.chdir('backend'); subprocess.run(['timeout', '30', 'python', '-m', 'src.scripts.initialize_vector_db']) if os.path.exists('src/scripts/initialize_vector_db.py') else None; subprocess.run(['uvicorn', 'src.api.main:app', '--host', '0.0.0.0', '--port', os.environ.get('PORT', '8000')])\""
 
 [variables]
 NODE_ENV = "production"
