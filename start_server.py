@@ -40,8 +40,14 @@ def start_server():
         sys.path.insert(0, str(backend_path))
 
     # Get the port from environment - Railway always sets this
-    port = int(os.environ.get("PORT", "8000"))
-    print(f"Environment PORT variable: {os.environ.get('PORT', 'not set')}")
+    # If not set, this is an error in Railway deployment
+    port_env = os.environ.get("PORT")
+    if port_env is None:
+        print("ERROR: PORT environment variable not set by Railway")
+        sys.exit(1)
+
+    port = int(port_env)
+    print(f"Environment PORT variable: {port_env}")
     print(f"Starting server on port {port}")
     print(f"Host: 0.0.0.0 (binding to all interfaces)")
 
