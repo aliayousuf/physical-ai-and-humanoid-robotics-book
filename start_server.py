@@ -73,6 +73,11 @@ if __name__ == "__main__":
     print("Starting backend server...")
     print(f"Current working directory: {os.getcwd()}")
 
+    # Ensure we're in the backend directory
+    backend_path = Path("/app/backend")
+    os.chdir(backend_path)
+    print(f"Changed to backend directory: {os.getcwd()}")
+
     # Initialize vector database
     initialize_vector_db()
 
