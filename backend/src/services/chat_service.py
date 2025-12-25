@@ -1,4 +1,10 @@
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    genai = None
+    GOOGLE_GENAI_AVAILABLE = False
+    print("Warning: google-generativeai not available, some features may be disabled")
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import uuid
@@ -16,7 +22,7 @@ class ChatService:
     Service for RAG (Retrieval Augmented Generation) functionality using Gemini
     """
     def __init__(self):
-        if settings.gemini_api_key:
+        if settings.gemini_api_key and GOOGLE_GENAI_AVAILABLE:
             try:
                 genai.configure(api_key=settings.gemini_api_key)
                 self.model = genai.GenerativeModel(settings.gemini_model_name)
@@ -26,7 +32,10 @@ class ChatService:
                 self.is_available = False
                 self.model = None
         else:
-            logger.warning("Gemini API key not provided to ChatService")
+            if not GOOGLE_GENAI_AVAILABLE:
+                logger.warning("Google Generative AI package not available, chat service will be unavailable")
+            else:
+                logger.warning("Gemini API key not provided to ChatService")
             self.is_available = False
             self.model = None
 

@@ -1,4 +1,10 @@
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    genai = None
+    GOOGLE_GENAI_AVAILABLE = False
+    print("Warning: google-generativeai not available, some features may be disabled")
 from typing import List, Dict, Any, Optional
 import asyncio
 from ..config.settings import settings
@@ -7,7 +13,7 @@ from ..utils.monitoring import check_service_usage, ServiceType
 
 class GeminiService:
     def __init__(self):
-        if settings.gemini_api_key:
+        if settings.gemini_api_key and GOOGLE_GENAI_AVAILABLE:
             try:
                 genai.configure(api_key=settings.gemini_api_key)
                 self.model = genai.GenerativeModel(settings.gemini_model_name)
@@ -22,7 +28,10 @@ class GeminiService:
                 self.model = None
                 self.generation_config = None
         else:
-            print("Warning: Gemini API key not provided, service will be unavailable")
+            if not GOOGLE_GENAI_AVAILABLE:
+                print("Warning: Google Generative AI package not available, gemini service will be unavailable")
+            else:
+                print("Warning: Gemini API key not provided, service will be unavailable")
             self.is_available = False
             self.model = None
             self.generation_config = None
@@ -77,7 +86,7 @@ class GeminiService:
         """
         Generate embedding for content using Gemini's embedding model
         """
-        if not self.is_available:
+        if not self.is_available or not GOOGLE_GENAI_AVAILABLE:
             print("Gemini service not available, cannot generate embedding")
             raise Exception("Gemini service not available")
 
@@ -87,11 +96,10 @@ class GeminiService:
 
         try:
             # Use the Google Generative AI embeddings
-            import google.generativeai as genai
             from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
             embeddings = GoogleGenerativeAIEmbeddings(
-                model=settings.gemini_model_name,
+                model=settings.gemini_embedding_model,  # Use the embedding model, not the main model
                 google_api_key=settings.gemini_api_key
             )
 

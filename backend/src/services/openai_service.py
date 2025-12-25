@@ -5,7 +5,13 @@ This service uses the OpenAI SDK pattern but routes requests to Google's Gemini 
 from typing import List, Dict, Any, Optional
 from openai import OpenAI
 from ..config.settings import settings
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    genai = None
+    GOOGLE_GENAI_AVAILABLE = False
+    print("Warning: google-generativeai not available in openai_service")
 from ..utils.monitoring import check_service_usage, ServiceType
 from ..utils.logging import logger
 
@@ -18,8 +24,14 @@ class OpenAIService:
 
     def __init__(self):
         # Configure the Google Generative AI client as the underlying engine
-        genai.configure(api_key=settings.gemini_api_key)
-        self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+        if GOOGLE_GENAI_AVAILABLE and settings.gemini_api_key:
+            genai.configure(api_key=settings.gemini_api_key)
+            self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+            self.is_available = True
+        else:
+            self.gemini_model = None
+            self.is_available = False
+            print("Warning: OpenAIService not available due to missing dependencies or API key")
 
         # Initialize OpenAI client with Gemini-compatible configuration
         # We'll use this to maintain the OpenAI SDK interface
@@ -34,6 +46,9 @@ class OpenAIService:
         """
         Generate a response using the configured model (Gemini via OpenAI patterns)
         """
+        if not self.is_available or not GOOGLE_GENAI_AVAILABLE:
+            raise Exception("OpenAIService not available")
+
         # Check usage limits before making API call
         if not check_service_usage(ServiceType.GEMINI):
             raise Exception("Gemini API usage limit exceeded. Please try again later.")

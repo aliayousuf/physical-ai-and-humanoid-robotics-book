@@ -5,9 +5,17 @@ This client uses the OpenAI SDK but routes requests to Google's Gemini API
 from typing import List, Dict, Any, Optional
 import openai
 from ..config.settings import settings
-from google.generativeai import configure as configure_genai
-import google.generativeai as genai
-from google.ai import generativelanguage as glm
+try:
+    from google.generativeai import configure as configure_genai
+    import google.generativeai as genai
+    from google.ai import generativelanguage as glm
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    configure_genai = None
+    genai = None
+    glm = None
+    GOOGLE_GENAI_AVAILABLE = False
+    print("Warning: google-generativeai not available in openai_client")
 import requests
 import json
 
@@ -20,8 +28,14 @@ class OpenAIGeminiAdapter:
 
     def __init__(self):
         # Configure the Google Generative AI client
-        configure_genai(api_key=settings.gemini_api_key)
-        self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+        if GOOGLE_GENAI_AVAILABLE and settings.gemini_api_key:
+            configure_genai(api_key=settings.gemini_api_key)
+            self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+            self.is_available = True
+        else:
+            self.gemini_model = None
+            self.is_available = False
+            print("Warning: OpenAIGeminiAdapter not available due to missing dependencies or API key")
 
         # For compatibility with OpenAI patterns, we'll also set the OpenAI API key
         # but this won't be used since we're routing through Gemini
@@ -38,6 +52,9 @@ class OpenAIGeminiAdapter:
         Adapter method that mimics OpenAI's chat.completions.create method
         but uses Google's Gemini API
         """
+        if not self.is_available or not GOOGLE_GENAI_AVAILABLE:
+            raise Exception("OpenAIGeminiAdapter not available")
+
         # Convert OpenAI-style messages to Gemini format
         gemini_contents = []
         for msg in messages:

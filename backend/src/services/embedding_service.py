@@ -1,4 +1,10 @@
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    genai = None
+    GOOGLE_GENAI_AVAILABLE = False
+    print("Warning: google-generativeai not available, some features may be disabled")
 from typing import List
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from ..config.settings import settings
@@ -8,7 +14,7 @@ from ..utils.monitoring import check_service_usage, ServiceType
 
 class EmbeddingService:
     def __init__(self):
-        if settings.gemini_api_key:
+        if settings.gemini_api_key and GOOGLE_GENAI_AVAILABLE:
             try:
                 # Configure the Google Generative AI
                 genai.configure(api_key=settings.gemini_api_key)
@@ -24,7 +30,10 @@ class EmbeddingService:
                 self.is_available = False
                 self.embeddings = None
         else:
-            print("Warning: Gemini API key not provided to EmbeddingService")
+            if not GOOGLE_GENAI_AVAILABLE:
+                print("Warning: Google Generative AI package not available, embedding service will be unavailable")
+            else:
+                print("Warning: Gemini API key not provided to EmbeddingService")
             self.is_available = False
             self.embeddings = None
 
