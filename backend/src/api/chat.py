@@ -2,9 +2,12 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional
 from datetime import datetime
 from pydantic import BaseModel
+import logging
 from ..services.rag_service import rag_service
 from ..utils.validation import sanitize_input, validate_query_length, is_malformed_query
 from ..utils.monitoring import track_performance
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter()
@@ -33,8 +36,13 @@ async def create_session(request: CreateSessionRequest) -> CreateSessionResponse
             created_at=session.created_at,
             expires_at=session.expires_at
         )
+    except HTTPException:
+        # Re-raise HTTP exceptions as they are already properly formatted
+        raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        from ..utils.logging import logger
+        logger.error(f"Error creating chat session: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create chat session")
 
 
 class GetSessionResponse(BaseModel):
@@ -78,8 +86,13 @@ async def get_session(session_id: str) -> GetSessionResponse:
             current_mode=session.current_mode.value if hasattr(session.current_mode, 'value') else str(session.current_mode),
             metadata=session.metadata
         )
+    except HTTPException:
+        # Re-raise HTTP exceptions as they are already properly formatted
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        from ..utils.logging import logger
+        logger.error(f"Error retrieving session {session_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve session")
 
 
 class QueryRequest(BaseModel):
@@ -162,7 +175,12 @@ async def query_endpoint(request: QueryRequest) -> QueryResponse:
                 }
             })
         raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        # Re-raise HTTP exceptions as they are already properly formatted
+        raise
     except Exception as e:
+        from ..utils.logging import logger
+        logger.error(f"Error processing query in {request.mode} mode: {str(e)}")
         raise HTTPException(status_code=500, detail={
             "error": {
                 "code": "RAG_PROCESSING_ERROR",
@@ -203,8 +221,13 @@ async def get_conversation_history(
                 }
             })
         raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        # Re-raise HTTP exceptions as they are already properly formatted
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        from ..utils.logging import logger
+        logger.error(f"Error retrieving conversation history for session {session_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve conversation history")
 
 
 class ClearContextResponse(BaseModel):
@@ -232,8 +255,13 @@ async def clear_session_context(session_id: str) -> ClearContextResponse:
                 }
             })
         raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        # Re-raise HTTP exceptions as they are already properly formatted
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        from ..utils.logging import logger
+        logger.error(f"Error clearing session context for session {session_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to clear session context")
 
 
 class ContentSummaryResponse(BaseModel):

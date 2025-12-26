@@ -8,8 +8,8 @@ psycopg[binary]>=3.1.0
 qdrant-client>=1.8.0
 langchain>=0.0.353
 langchain-community>=0.0.38
-langchain-google-genai>=0.0.8
-google-generativeai>=0.8.3
+langchain-google-genai>=0.1.18
+google-generativeai>=0.7.0,<0.9.0
 # Cohere dependency removed - switching to Google Gemini embeddings
 python-multipart>=0.0.6
 python-dotenv>=1.0.0

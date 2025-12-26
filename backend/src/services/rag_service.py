@@ -4,9 +4,35 @@ from uuid import uuid4
 from ..models.session import UserSession, Message, QueryMode
 from ..models.query import QueryHistory, UserSelectionContext
 from ..config.settings import settings
-from .qdrant_service import qdrant_service
-from .gemini_service import gemini_service
-from .embedding_service import embedding_service
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Import services with error handling to prevent initialization failures
+try:
+    from .qdrant_service import qdrant_service
+    QDRANT_AVAILABLE = True
+except Exception as e:
+    logger.error(f"Failed to import qdrant_service: {e}")
+    QDRANT_AVAILABLE = False
+    qdrant_service = None
+
+try:
+    from .gemini_service import gemini_service
+    GEMINI_AVAILABLE = True
+except Exception as e:
+    logger.error(f"Failed to import gemini_service: {e}")
+    GEMINI_AVAILABLE = False
+    gemini_service = None
+
+try:
+    from .embedding_service import embedding_service
+    EMBEDDING_AVAILABLE = True
+except Exception as e:
+    logger.error(f"Failed to import embedding_service: {e}")
+    EMBEDDING_AVAILABLE = False
+    embedding_service = None
+
 from ..utils.logging import log_error, log_rag_query, alert_on_error
 
 
@@ -51,11 +77,98 @@ class RAGService:
         if len(query) > settings.max_query_length:
             raise ValueError(f"Query exceeds maximum length of {settings.max_query_length} characters")
 
+        # Check if required services are available
+        if not EMBEDDING_AVAILABLE or embedding_service is None:
+            logger.error("Embedding service not available")
+            # Return a response without RAG functionality
+            response_text = (
+                "I can answer your question, but the RAG (Retrieval Augmented Generation) functionality is not available. "
+                "This means I cannot search through the book content to provide specific answers. "
+                "I'll do my best to answer based on my general knowledge: "
+                "Please provide more context or check if the topic is covered in the documentation."
+            )
+
+            # Create response message
+            response_message = Message(
+                id=str(uuid4()),
+                session_id=session_id,
+                role="assistant",
+                content=response_text,
+                timestamp=datetime.now(),
+                sources=[]
+            )
+
+            # Add user query to session history
+            user_message = Message(
+                id=str(uuid4()),
+                session_id=session_id,
+                role="user",
+                content=query,
+                timestamp=datetime.now()
+            )
+
+            session.conversation_history.append(user_message)
+            session.conversation_history.append(response_message)
+
+            # Return the response
+            return {
+                "response_id": response_message.id,
+                "session_id": session_id,
+                "query": query,
+                "response": response_text,
+                "sources": [],
+                "timestamp": datetime.now(),
+                "query_mode": "general"
+            }
+
         # Generate embedding for the query
         start_time = datetime.now()
         query_embedding = await embedding_service.embed_single_text(query, input_type="search_query")
 
         # Search for similar content in the vector database
+        if not QDRANT_AVAILABLE or qdrant_service is None:
+            logger.error("Qdrant service not available")
+            # Return a response without RAG functionality
+            response_text = (
+                "I can answer your question, but the search functionality is not available. "
+                "This means I cannot search through the book content to provide specific answers. "
+                "I'll do my best to answer based on my general knowledge: "
+                "Please provide more context or check if the topic is covered in the documentation."
+            )
+
+            # Create response message
+            response_message = Message(
+                id=str(uuid4()),
+                session_id=session_id,
+                role="assistant",
+                content=response_text,
+                timestamp=datetime.now(),
+                sources=[]
+            )
+
+            # Add user query to session history
+            user_message = Message(
+                id=str(uuid4()),
+                session_id=session_id,
+                role="user",
+                content=query,
+                timestamp=datetime.now()
+            )
+
+            session.conversation_history.append(user_message)
+            session.conversation_history.append(response_message)
+
+            # Return the response
+            return {
+                "response_id": response_message.id,
+                "session_id": session_id,
+                "query": query,
+                "response": response_text,
+                "sources": [],
+                "timestamp": datetime.now(),
+                "query_mode": "general"
+            }
+
         search_results = await qdrant_service.search_similar(
             query_embedding,
             top_k=settings.rag_top_k,
@@ -80,16 +193,25 @@ class RAGService:
             # No relevant content found, inform the user
             response_text = "I couldn't find any relevant content in the book to answer your question. Please try rephrasing your question or check if the topic is covered in the documentation."
         else:
-            try:
-                response_text = await gemini_service.generate_response(query, context_content)
-            except Exception as e:
-                print(f"Error generating response with Gemini: {e}")
+            if not GEMINI_AVAILABLE or gemini_service is None:
+                logger.error("Gemini service not available")
                 # Graceful degradation: provide a helpful message
                 response_text = (
                     "I found relevant content in the book, but encountered an issue generating a response. "
                     "Please try again, or check the following potentially relevant sections:\n" +
                     "\n".join([f"- {ctx['title']} (Score: {ctx['relevance_score']:.2f})" for ctx in context_content])
                 )
+            else:
+                try:
+                    response_text = await gemini_service.generate_response(query, context_content)
+                except Exception as e:
+                    logger.error(f"Error generating response with Gemini: {e}")
+                    # Graceful degradation: provide a helpful message
+                    response_text = (
+                        "I found relevant content in the book, but encountered an issue generating a response. "
+                        "Please try again, or check the following potentially relevant sections:\n" +
+                        "\n".join([f"- {ctx['title']} (Score: {ctx['relevance_score']:.2f})" for ctx in context_content])
+                    )
 
         # Log the RAG query with performance metrics
         response_time = (datetime.now() - start_time).total_seconds()
@@ -194,15 +316,23 @@ class RAGService:
             session.selected_text_context = selection_context
 
             # Generate response using the LLM with selected text as context
-            try:
-                response_text = await gemini_service.generate_response(query, context_content)
-            except Exception as e:
-                print(f"Error generating response with Gemini for selected text: {e}")
+            if not GEMINI_AVAILABLE or gemini_service is None:
+                logger.error("Gemini service not available for selected text query")
                 # Graceful degradation: provide a helpful message
                 response_text = (
                     "I have the selected text context, but encountered an issue generating a response. "
                     "Please try again, or consider rephrasing your question about the selected text."
                 )
+            else:
+                try:
+                    response_text = await gemini_service.generate_response(query, context_content)
+                except Exception as e:
+                    logger.error(f"Error generating response with Gemini for selected text: {e}")
+                    # Graceful degradation: provide a helpful message
+                    response_text = (
+                        "I have the selected text context, but encountered an issue generating a response. "
+                        "Please try again, or consider rephrasing your question about the selected text."
+                    )
 
         # Log the RAG query with performance metrics
         response_time = (datetime.now() - start_time).total_seconds()
@@ -277,52 +407,109 @@ class RAGService:
         """
         Retrieve conversation history for a session
         """
-        session = await self.get_session(session_id)
-        if not session:
-            raise ValueError("Invalid or expired session ID")
+        try:
+            session = await self.get_session(session_id)
+            if not session:
+                raise ValueError("Invalid or expired session ID")
 
-        # Get messages with pagination
-        total_messages = len(session.conversation_history)
-        start_idx = min(offset, total_messages)
-        end_idx = min(offset + limit, total_messages)
+            # Get messages with pagination
+            total_messages = len(session.conversation_history)
+            start_idx = min(offset, total_messages)
+            end_idx = min(offset + limit, total_messages)
 
-        messages = session.conversation_history[start_idx:end_idx]
+            messages = session.conversation_history[start_idx:end_idx]
 
-        return {
-            "session_id": session_id,
-            "messages": [
-                {
-                    "id": msg.id,
-                    "role": msg.role,
-                    "content": msg.content,
-                    "timestamp": msg.timestamp,
-                    "sources": msg.sources
-                } for msg in messages
-            ],
-            "pagination": {
-                "limit": limit,
-                "offset": offset,
-                "total": total_messages
+            return {
+                "session_id": session_id,
+                "messages": [
+                    {
+                        "id": msg.id,
+                        "role": msg.role,
+                        "content": msg.content,
+                        "timestamp": msg.timestamp,
+                        "sources": msg.sources
+                    } for msg in messages
+                ],
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset,
+                    "total": total_messages
+                }
             }
-        }
+        except ValueError:
+            # Re-raise ValueError as they are expected
+            raise
+        except Exception as e:
+            logger.error(f"Error retrieving conversation history: {e}")
+            # Return empty history as fallback
+            return {
+                "session_id": session_id,
+                "messages": [],
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset,
+                    "total": 0
+                }
+            }
 
     async def clear_selected_text_context(self, session_id: str) -> Dict[str, Any]:
         """
         Clear the selected text context and return to general mode
         """
-        session = await self.get_session(session_id)
-        if not session:
-            raise ValueError("Invalid or expired session ID")
+        try:
+            session = await self.get_session(session_id)
+            if not session:
+                raise ValueError("Invalid or expired session ID")
 
-        session.selected_text_context = None
-        session.current_mode = QueryMode.GENERAL
+            session.selected_text_context = None
+            session.current_mode = QueryMode.GENERAL
 
-        return {
-            "session_id": session_id,
-            "message": "Session context cleared",
-            "new_mode": "general"
-        }
+            return {
+                "session_id": session_id,
+                "message": "Session context cleared",
+                "new_mode": "general"
+            }
+        except ValueError:
+            # Re-raise ValueError as they are expected
+            raise
+        except Exception as e:
+            logger.error(f"Error clearing selected text context: {e}")
+            # Return appropriate error response
+            raise ValueError(f"Error clearing selected text context: {str(e)}")
 
 
-# Global instance
-rag_service = RAGService()
+# Global instance with error handling
+try:
+    rag_service = RAGService()
+except Exception as e:
+    logger.error(f"Failed to initialize RAG service: {e}")
+    # Create a mock service that indicates it's not available
+    class MockRAGService:
+        def __init__(self):
+            self.sessions = {}
+
+        async def create_session(self, initial_context=None):
+            logger.error("RAG service not available, cannot create session")
+            raise Exception("RAG service is not available")
+
+        async def get_session(self, session_id):
+            logger.error("RAG service not available, cannot get session")
+            return None
+
+        async def process_general_query(self, session_id, query, page_url=None):
+            logger.error("RAG service not available, cannot process general query")
+            raise Exception("RAG service is not available")
+
+        async def process_selected_text_query(self, session_id, query, selected_text, page_url=None, section_context=None):
+            logger.error("RAG service not available, cannot process selected text query")
+            raise Exception("RAG service is not available")
+
+        async def get_conversation_history(self, session_id, limit=20, offset=0):
+            logger.error("RAG service not available, cannot get conversation history")
+            return {"session_id": session_id, "messages": [], "pagination": {"limit": limit, "offset": offset, "total": 0}}
+
+        async def clear_selected_text_context(self, session_id):
+            logger.error("RAG service not available, cannot clear selected text context")
+            raise Exception("RAG service is not available")
+
+    rag_service = MockRAGService()
